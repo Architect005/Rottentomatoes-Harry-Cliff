@@ -67,7 +67,7 @@ const Home: NextPage = ({}) => {
         </section>
         <footer>
           <p className="py-4 text-center text-sm font-semibold uppercase text-gray-300">
-            By Awesome person
+            By Survivors
           </p>
         </footer>
       </main>
