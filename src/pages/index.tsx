@@ -22,7 +22,7 @@ const Home: NextPage = ({}) => {
               <h4 className=" text-xl font-bold text-red-500"> RT</h4>
               <div className="flex items-center space-x-2 space-x-2min-h-screen text-sm text-gray-700">
                 <Link href="">ABOUT US</Link>
-                <Link href="/register">REGISTER</Link>
+                <Link href="/login">LOGIN/REGISTER</Link>
               </div>
             </nav>
 
