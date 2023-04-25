@@ -1,5 +1,3 @@
-import axios, { Axios } from "axios";
-
 export default function fetcher(url: string, data: any = undefined) {
   return fetch(`${window.location.origin}/api${url}`, {
     method: data ? "POST" : "GET",

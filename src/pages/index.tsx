@@ -1,12 +1,20 @@
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
+import { getMovie } from "@/functions/request";
 import { type NextPage } from "next";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const Home: NextPage = ({}) => {
   const [topratedMovie, setTopratedMovie] = useState();
   const [discoverMovie, setDiscoverMovie] = useState([]);
+
+  useEffect(() => {
+    getMovie("/discover/movie")
+    .then((res) => (
+      setDiscoverMovie(res.results)
+    ))
+  }, []);
 
   return (
     <>
@@ -51,18 +59,12 @@ const Home: NextPage = ({}) => {
 
         <section className="mx-auto mt-56 h-full w-full max-w-4xl py-12">
           <div className="grid h-full grid-cols-4 gap-x-4 gap-y-8">
-            <MovieList/>
-            <MovieList/>
-            <MovieList/>
-            <MovieList/>
             {discoverMovie
               .map((movie) => (
-                  <Link href="">
-                    <MovieList/>
-                 </Link>
-                )
-              )
-            }
+                <Link href={"/movie/" + movie.id}>
+                  <MovieList rating={movie.rating} title={movie.title} image={movie.poster_path} genre={movie.genre} duration={movie.duration}/>
+                </Link>
+              ))}
           </div>
         </section>
         <footer>
@@ -77,22 +79,22 @@ const Home: NextPage = ({}) => {
 
 export default Home;
 
-function MovieList({}) {
+function MovieList({ image, title, rating, duration, genre}) {
   return (
     <div className="text-sm font-semibold text-gray-100">
       <div className="relative h-72 w-full flex-none rounded-lg">
         <Image
           className="rounded-xl"
           alt="Movie image"
-          src="/index.jpg"
+          src={"https://image.tmdb.org/t/p/w500/" + image}
           fill
         />
       </div>
       <div className="mt-2 space-y-1">
-        <p>NAME</p>
+        <p>{title}</p>
         <div className="mt-2 space-y-1">
-          <p>120 min | ACTION</p>
-          <small>100%</small>
+          <p>{duration} | {genre}</p>
+          <small>{rating*10}%</small>
         </div>
       </div>
     </div>
