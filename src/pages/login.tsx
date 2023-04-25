@@ -2,14 +2,38 @@ import Link from "next/link";
 import Image from "next/image";
 import { toast } from "react-hot-toast";
 import { useState } from "react";
+import { useRouter } from "next/router";
+import { login } from "@/functions/api.request";
 
 function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const router = useRouter();
 
-    function onChangeEmail() {
+    function onChangeEmail(e: any) {
+        setEmail(e.target.value);
     }
-    function onChangePassword() {
+    function onChangePassword(e: any) {
+        setPassword(e.target.value);
+    }
+
+    async function onSubmit(e: any) {
+        e.preventDefault();
+        const toastId = toast.loading("loading...");
+        try {
+            const response = await login({ email, password });
+            if (response.status == 201) {
+              toast.success("User log succesfully.", {
+                id: toastId,
+              });
+              router.push("/");
+            }
+        } catch (e) {
+            console.error(e);
+            toast.success("User can't", {
+            id: toastId,
+        });
+      }
     }
 
     return(
@@ -28,7 +52,7 @@ function LoginPage() {
             </div>
             <div className="w-96">
                 <h4 className="mb-6 text-3xl font-semibold text-gray-100">Sign In</h4>
-                <form>
+                <form onSubmit={onSubmit}>
                     <div>
                         <label htmlFor="" className="text-gray-100">
                             Email
