@@ -1,19 +1,61 @@
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
+import { toast } from "react-hot-toast";
+import { Rating } from "@smastrom/react-rating";
+import "@smastrom/react-rating/style.css";
+import { useEffect, useState } from "react";
+import prisma from "@/functions/prisma";
+import { createCommentAndRate, getMovie } from "@/functions/request";
+import { useRouter } from "next/router";
+import { RoleEnum } from "@/functions/role.enum";
 import { type NextPage } from "next";
-import { useState } from "react";
 
-const Home: NextPage = ({}) => {
+const Movies: NextPage = ({ user, comments, id }: any) => {
     const [rating, setRating] = useState<number>(0);
     const [comment, setComment] = useState<string>("");
-    const [movieData, setMovieData] = useState(null); 
+    const [movieData, setMovieData] = useState(""); 
     const [actorList, setActorList] = useState([]);
-    
-    function onChangeComment() {
+    const [discoverMovie, setDiscoverMovie] = useState([]);
+
+    const router = useRouter();
+    const { movieId } = router.query;
+
+    useEffect(() => {
+      getMovie("/discover/movie/")
+      .then((res) => (
+        setDiscoverMovie(res.results)
+      ))
+
+      getMovie("/movie/" + movieId)
+      .then((res) =>(
+        setMovieData(res)
+      ))
+    }, []);
+
+    function onChangeComment(e) {
+      setComment(e.target.value);
     }
 
-    function onChangeRate() {
+    function onChangeRate(value) {
+      setRating(value);
+    }
+
+    async function onSubmit(e) {
+      e.preventDefault();
+
+      const toastId = toast.loading("loading...");
+      try {
+        const response = await createCommentAndRate({ comment: comment, rate: rating, Id: movieId });
+          toast.success("Ihank you !.", {
+            id: toastId,
+          });
+          router.reload()
+      } catch (e) {
+        toast.success("An error occur.", {
+          id: toastId,
+        });
+      }
     }
 
     return (
@@ -24,19 +66,23 @@ const Home: NextPage = ({}) => {
           <link rel="icon" href="/favicon.ico"/>
         </Head>
         <main className="min-h-screen bg-gray-800">
-          <div className="h-[50vh] w-full bg-white">
+          <div className="h-[63vh] w-full bg-white">
             <div className="mx-auto h-full max-w-4xl">
               <nav className="flex items-center justify-between py-3">
                 <h4 className=" text-xl font-bold text-red-500"> RT</h4>
                 <div className="flex items-center space-x-2 space-x-2min-h-screen text-sm text-gray-700">
                   <Link href="">ABOUT US</Link>
-                  <Link href="/login">LOGOUT</Link>
+                  {user ? (
+                    <Link href="/login">LOGOUT</Link>
+                  ) : (
+                    <Link href="/register">REGISTER</Link>
+                  )}
                 </div>
               </nav>
 
               {/* Hero Section */}
               <div className="flex  gap-x-10 lg:mt-20">
-                <div className="relative h-80 w-60 flex-none rounded-lg">
+                <div className="relative h-60 w-60 flex-none rounded-lg">
                   <Image
                     className="rounded-xl"
                     alt="Movie image"
@@ -46,7 +92,7 @@ const Home: NextPage = ({}) => {
                 </div>
                 <div className="space-y-4">
                   <p className="text-xs">2021</p>
-                  <h4 className="text-5xl font-bold">NAME</h4>
+                  <h4 className="text-5xl font-bold">{movieData.title}</h4>
                   <small>Action</small>
                   <p className="w-96 text-xs text-gray-800">
                     Overview
@@ -54,13 +100,23 @@ const Home: NextPage = ({}) => {
                   <div></div>
                 </div>
               </div>
-              <form className="mt-12">
+              {user ? (
+              <form onSubmit={onSubmit} className="mt-12">
                 <div className="flex items-center justify-between">
+                  <h4 className="mb-4 border-l-4 border-red-700 pl-1 font-semibold uppercase text-gray-200">
+                    RATE AND REVIEW
+                  </h4>
+                  <Rating
+                    style={{ maxWidth: 100 }}
+                    value={rating}
+                    onChange={onChangeRate}
+                  />
                 </div>
                 <textarea
                   onChange={onChangeComment}
                   name=""
                   id=""
+                  value={comment}
                   cols={20}
                   rows={5}
                   className="w-full appearance-none rounded-xl bg-gray-500 p-1  text-gray-100 outline-none focus-within:ring-gray-900 focus-within:ring-offset-1 focus-within:ring-offset-transparent focus:ring-4"
@@ -70,16 +126,48 @@ const Home: NextPage = ({}) => {
                     Commenter
                   </button>
                 </div>
-              </form>
+              </form>) : (
+                <div className='mt-8 text-gray-100 space-y-4'>
+                { comments && comments.map(comment => (
+                  <div>
+                      <div className='flex items-center justify-between'>
+                        <p>{comment.author.name}</p>
+                        <Rating
+                          style={{ maxWidth: 80 }}
+                          value={4}
+                          />
+                      </div>
+                      <p>{comment.content}</p>
+                    </div>
+                    ))}
+                  </div>
+                )}
             </div>
+          </div>
+
+          <div className='mt-8 text-gray-100 space-y-4'>
+            { comments && comments.map(comment => (
+              <div>
+                <div className='flex items-center justify-between'>
+                  <p>{comment.author.name}</p>
+                  <Rating
+                    style={{ maxWidth: 80 }}
+                    value={4}
+                    />
+                </div>
+                <p>{comment.content}</p>
+              </div>
+             ))}
           </div>
 
           <section className="mx-auto mt-60 h-full w-full max-w-4xl py-20">
             <div className="grid h-full grid-cols-4 gap-x-4 gap-y-8">
-              <MovieList/>
-              <MovieList/>
-              <MovieList/>
-              <MovieList/>
+              {discoverMovie
+              .map((movie) => (
+                <Link href="/movie/account">
+                  <MovieList rating={movie.vote_average} title={movie.title} image={movie.poster_path} genre={movie.genres} duration={movie.runtime} id={id}/>
+                </Link>
+              ))}
             </div>
           </section>
           <footer>
@@ -92,24 +180,24 @@ const Home: NextPage = ({}) => {
     );
 };  
 
-export default Home;
+export default Movies;
 
-function MovieList({}) {
+function MovieList({ image, title, rating, duration, genre, id}) {
   return (
     <div className="text-sm font-semibold text-gray-100">
-      <div className="mt-20 relative h-72 w-full flex-none rounded-lg">
+      <div className="relative py-50 h-72 w-full flex-none rounded-lg">
         <Image
           className="rounded-xl"
           alt="Movie image"
-          src="/index.jpg"
+          src={"https://image.tmdb.org/t/p/w500/" + image}
           fill
         />
       </div>
       <div className="mt-2 space-y-1">
-        <p>NAME</p>
+        <p>{title}</p>
         <div className="mt-2 space-y-1">
           <p>120 min | ACTION</p>
-          <small>100%</small>
+          <small>Vote: {rating*10}%</small>
         </div>
       </div>
     </div>

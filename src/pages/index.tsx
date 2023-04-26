@@ -2,19 +2,30 @@ import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
 import { getMovie } from "@/functions/request";
+import { RoleEnum } from "@/functions/role.enum";
 import { type NextPage } from "next";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
-const Home: NextPage = ({}) => {
-  const [topratedMovie, setTopratedMovie] = useState();
+const Home: NextPage = ({ user }) => {
+  const [topratedMovie, setTopratedMovie] = useState([]);
   const [discoverMovie, setDiscoverMovie] = useState([]);
+
+  const router = useRouter();
+  const { movieId } = router.query;
 
   useEffect(() => {
     getMovie("/discover/movie")
     .then((res) => (
       setDiscoverMovie(res.results)
     ))
+
+    getMovie("/movie/top_rated")
+    .then((res) => {
+      setTopratedMovie(res.results);
+    })
   }, []);
+
 
   return (
     <>
@@ -30,17 +41,27 @@ const Home: NextPage = ({}) => {
               <h4 className=" text-xl font-bold text-red-500"> RT</h4>
               <div className="flex items-center space-x-2 space-x-2min-h-screen text-sm text-gray-700">
                 <Link href="">ABOUT US</Link>
-                <Link href="/login">LOGIN/REGISTER</Link>
+                {user ? (
+                  <Link href="/login">LOG OUT</Link>
+                ) : (
+                  <Link href="/register">LOG IN/REGISTER</Link>
+                )}
               </div>
             </nav>
 
             {/* Hero Section */}
             <div className="flex  gap-x-10 lg:mt-20">
               <div className="relative h-80 w-60 flex-none rounded-lg">
+                {topratedMovie.map((top_rated) => (
+                <MovieList rating={top_rated.vote_average} title={top_rated.title} image={top_rated.poster_path} genre={top_rated.video} duration={top_rated.runtime}/>
+                ))}
                 <Image
                   className="rounded-xl"
                   alt="Movie image"
-                  src="/index.jpg"
+                  src={
+                    "https://image.tmdb.org/t/p/w500/" + 
+                    topratedMovie.poster_path
+                  }
                   fill
                 />
               </div>
@@ -49,7 +70,7 @@ const Home: NextPage = ({}) => {
                 <h4 className="text-5xl font-bold">NAME</h4>
                 <small>Action</small>
                 <p className="w-96 text-xs text-gray-800">
-                  Overview
+                  {topratedMovie.overview}
                 </p>
                 <div></div>
               </div>
@@ -61,8 +82,8 @@ const Home: NextPage = ({}) => {
           <div className="grid h-full grid-cols-4 gap-x-4 gap-y-8">
             {discoverMovie
               .map((movie) => (
-                <Link href={"/movie/" + movie.id}>
-                  <MovieList rating={movie.rating} title={movie.title} image={movie.poster_path} genre={movie.genre} duration={movie.duration}/>
+                <Link href="/movie/account">
+                  <MovieList rating={movie.vote_average} title={movie.title} image={movie.poster_path} genre={movie.genres} duration={movie.runtime}/>
                 </Link>
               ))}
           </div>
@@ -93,8 +114,8 @@ function MovieList({ image, title, rating, duration, genre}) {
       <div className="mt-2 space-y-1">
         <p>{title}</p>
         <div className="mt-2 space-y-1">
-          <p>{duration} | {genre}</p>
-          <small>{rating*10}%</small>
+          <p>120 min | ACTION</p>
+          <small>Vote: {rating*10}%</small>
         </div>
       </div>
     </div>
