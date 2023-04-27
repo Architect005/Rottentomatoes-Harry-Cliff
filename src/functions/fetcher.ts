@@ -1,4 +1,5 @@
 export default function fetcher(url: string, data: any = undefined) {
+  console.log("fetch");
   return fetch(`${window.location.origin}/api${url}`, {
     method: data ? "POST" : "GET",
     credentials: "include",
@@ -10,7 +11,7 @@ export default function fetcher(url: string, data: any = undefined) {
     if (res.status > 399 && res.status < 200) {
       throw new Error();
     }
-    console.log(res.json());
+    console.log({data});
     return res.json();
   });
 }
