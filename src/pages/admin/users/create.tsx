@@ -5,7 +5,6 @@ import { RoleEnum } from "@/functions/role.enum";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { toast } from "react-hot-toast";
-import { createAdmin } from "@/functions/api.request";
 
 export default function OneUser({ user }: any) {
   const [name, setName] = useState("");
@@ -23,25 +22,6 @@ export default function OneUser({ user }: any) {
 
   function onChnagePassword(e: any) {
     setPassword(e.target.value);
-  }
-
-  async function onSubmit(e: any) {
-    e.preventDefault();
-    const toastId = toast.loading("loading...");
-    try {
-      const response = await createAdmin({ name, email, password });
-      if (response.status == 201) {
-        toast.success("User is created succesfully.", {
-          id: toastId,
-        });
-        router.push("/admin/user");
-      }
-    } catch (e) {
-      console.error(e);
-      toast.success("Utilisateur existe déjà.", {
-        id: toastId,
-      });
-    }
   }
 
   return (
@@ -71,7 +51,6 @@ export default function OneUser({ user }: any) {
         </div>
 
         <div>
-          <form onSubmit={onSubmit} className="grid grid-cols-4 gap-x-4">
             <div>
               <label htmlFor="" className="text-gray-700">
                 Name

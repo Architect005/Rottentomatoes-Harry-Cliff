@@ -6,7 +6,7 @@ import { deleteUser } from "@/functions/api.request";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/router";
 
-export default function userList({}) {
+export default function userList({ user, userList }: any) {
   const router = useRouter();
   
   async function onDeleteUser(id: string) {
