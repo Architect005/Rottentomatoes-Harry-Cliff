@@ -6,9 +6,23 @@ import { RoleEnum } from "@/functions/role.enum";
 import { type NextPage } from "next";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { Interface } from "readline";
 
 const Home: NextPage = ({ user }) => {
-  const [topratedMovie, setTopratedMovie] = useState([]);
+
+  interface movie {
+    poster_path? : String;
+    adult? : boolean;
+    overview? : String;
+    release_date? : String;
+    id? : number;
+    vote_average? : number;
+    title? : String;
+    popularity? : number;
+    genre_ids? : number[];
+  }
+
+  const [topratedMovie, setTopratedMovie] = useState<movie[]>([]);
   const [discoverMovie, setDiscoverMovie] = useState([]);
 
   const router = useRouter();
@@ -23,9 +37,15 @@ const Home: NextPage = ({ user }) => {
     getMovie("/movie/top_rated")
     .then((res) => {
       setTopratedMovie(res.results);
+      console.log(res.results);
     })
   }, []);
 
+  if(!topratedMovie[0]) {
+    return <div className='w-full h-screen flex items-center justify-center'>
+      <p className='text-center'>Loading...</p>
+    </div>
+  }
 
   return (
     <>
@@ -35,7 +55,7 @@ const Home: NextPage = ({ user }) => {
         <link rel="icon" href="/favicon.ico"/>
       </Head>
       <main className="min-h-screen bg-gray-800">
-        <div className="h-[50vh] w-full bg-white">
+        <div className="h-[60vh] w-full bg-white">
           <div className="mx-auto h-full max-w-4xl">
             <nav className="flex items-center justify-between py-3">
               <h4 className=" text-xl font-bold text-red-500"> RT</h4>
@@ -52,27 +72,25 @@ const Home: NextPage = ({ user }) => {
             {/* Hero Section */}
             <div className="flex  gap-x-10 lg:mt-20">
               <div className="relative h-80 w-60 flex-none rounded-lg">
-                {topratedMovie.map((top_rated) => (
-                <MovieList rating={top_rated.vote_average} title={top_rated.title} image={top_rated.poster_path} genre={top_rated.video} duration={top_rated.runtime}/>
-                ))}
+                <div></div>
                 <Image
                   className="rounded-xl"
                   alt="Movie image"
                   src={
                     "https://image.tmdb.org/t/p/w500/" + 
-                    topratedMovie.poster_path
+                    topratedMovie[0].poster_path
                   }
                   fill
                 />
               </div>
               <div className="space-y-4">
-                <p className="text-xs">2021</p>
-                <h4 className="text-5xl font-bold">NAME</h4>
+                <p className="text-xs">{topratedMovie[0].release_date}</p>
+                <h4 className="text-5xl font-bold">{topratedMovie[0].title}</h4>
                 <small>Action</small>
                 <p className="w-96 text-xs text-gray-800">
-                  {topratedMovie.overview}
+                  {topratedMovie[0].overview}
                 </p>
-                <div></div>
+                <small>Vote: {topratedMovie[0].vote_average*10}%</small>
               </div>
             </div>
           </div>
@@ -81,7 +99,7 @@ const Home: NextPage = ({ user }) => {
         <section className="mx-auto mt-56 h-full w-full max-w-4xl py-12">
           <div className="grid h-full grid-cols-4 gap-x-4 gap-y-8">
             {discoverMovie
-              .map((movie) => (
+              .map((movie, index) => (
                 <Link href="/movie/account">
                   <MovieList rating={movie.vote_average} title={movie.title} image={movie.poster_path} genre={movie.genres} duration={movie.runtime}/>
                 </Link>

@@ -10,6 +10,7 @@ export default function fetcher(url: string, data: any = undefined) {
     if (res.status > 399 && res.status < 200) {
       throw new Error();
     }
+    console.log(res.json());
     return res.json();
   });
 }

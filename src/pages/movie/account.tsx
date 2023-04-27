@@ -19,7 +19,21 @@ const Movies: NextPage = ({ user, comments, id }: any) => {
     const [discoverMovie, setDiscoverMovie] = useState([]);
 
     const router = useRouter();
-    const { movieId } = router.query;
+    const { index } = router.query;
+
+    interface movie {
+      poster_path? : String;
+      adult? : boolean;
+      overview? : String;
+      release_date? : String;
+      id? : number;
+      vote_average? : number;
+      title? : String;
+      popularity? : number;
+      genre_ids? : number[];
+    }
+
+  const [topMovie, setData] = useState<movie[]>([]);
 
     useEffect(() => {
       getMovie("/discover/movie/")
@@ -27,9 +41,14 @@ const Movies: NextPage = ({ user, comments, id }: any) => {
         setDiscoverMovie(res.results)
       ))
 
-      getMovie("/movie/" + movieId)
+      getMovie("/discover/movie/")
       .then((res) =>(
-        setMovieData(res)
+        setMovieData(res.results)
+      ))
+
+      getMovie("/discover/movie/")
+      .then((res) =>(
+        setData(res.results)
       ))
     }, []);
 
@@ -57,6 +76,12 @@ const Movies: NextPage = ({ user, comments, id }: any) => {
         });
       }
     }
+    
+    if(!topMovie[0]) {
+      return <div className='w-full h-screen flex items-center justify-center'>
+        <p className='text-center'>Loading...</p>
+      </div>
+    }
 
     return (
       <>
@@ -80,13 +105,17 @@ const Movies: NextPage = ({ user, comments, id }: any) => {
                 </div>
               </nav>
 
+
               {/* Hero Section */}
-              <div className="flex  gap-x-10 lg:mt-20">
-                <div className="relative h-60 w-60 flex-none rounded-lg">
+              <div className="flex gap-x-10 lg:mt-20">
+                <div className="relative h-80 w-60 flex-none rounded-lg">
                   <Image
                     className="rounded-xl"
                     alt="Movie image"
-                    src="/index.jpg"
+                    src={
+                    "https://image.tmdb.org/t/p/w500/"
+                    + topMovie[0].poster_path
+                    }
                     fill
                   />
                 </div>
@@ -163,7 +192,7 @@ const Movies: NextPage = ({ user, comments, id }: any) => {
           <section className="mx-auto mt-60 h-full w-full max-w-4xl py-20">
             <div className="grid h-full grid-cols-4 gap-x-4 gap-y-8">
               {discoverMovie
-              .map((movie) => (
+              .map((movie, index) => (
                 <Link href="/movie/account">
                   <MovieList rating={movie.vote_average} title={movie.title} image={movie.poster_path} genre={movie.genres} duration={movie.runtime} id={id}/>
                 </Link>
