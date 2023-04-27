@@ -1,7 +1,13 @@
-
+import { validateToken } from "@/functions/auth";
+import prisma from "@/functions/prisma";
 import Link from "next/link";
+import { RoleEnum } from "@/functions/role.enum";
+import { deleteUser } from "@/functions/api.request";
+import { toast } from "react-hot-toast";
+import { useRouter } from "next/router";
 
 export default function userList({}) {
+  const router = useRouter();
   
     return (
     <main className="flex h-screen w-full  flex-1">
@@ -99,5 +105,33 @@ export default function userList({}) {
       </section>
     </main>
   );
+
 }
 
+export const getServerSideProps = async ({ query, req }) => {
+  let user;
+
+  const userList = await prisma.user.findMany({
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      role: true,
+    },
+  });
+
+  try {
+    user = validateToken(req.cookies.ACCESS_TOKEN);
+  } catch (e) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: "/login",
+      },
+    };
+  }
+
+  return {
+    props: { user, userList },
+  };
+};

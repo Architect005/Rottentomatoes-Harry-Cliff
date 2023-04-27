@@ -5,6 +5,7 @@ export function register(data: {
   email: string;
   password: string;
 }) {
+  console.log("Submit");
   return fetcher("/register", data);
 }
 
