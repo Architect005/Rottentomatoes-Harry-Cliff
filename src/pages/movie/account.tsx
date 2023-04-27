@@ -4,6 +4,7 @@ import Image from "next/image";
 import { toast } from "react-hot-toast";
 import { Rating } from "@smastrom/react-rating";
 import "@smastrom/react-rating/style.css";
+import jwt from "jsonwebtoken";
 import { FilterEnum } from "@/functions/filter";
 import { useEffect, useState } from "react";
 import prisma from "@/functions/prisma";
@@ -15,7 +16,7 @@ import { type NextPage } from "next";
 const Movies: NextPage = ({ user, comments, id }: any) => {
     const [rating, setRating] = useState<number>(0);
     const [comment, setComment] = useState<string>("");
-    const [movieData, setMovieData] = useState(""); 
+    const [movieData, setMovieData] = useState<string>(""); 
     const [actorList, setActorList] = useState([]);
     const [discoverMovie, setDiscoverMovie] = useState([]);
 
@@ -66,13 +67,13 @@ const Movies: NextPage = ({ user, comments, id }: any) => {
 
       const toastId = toast.loading("loading...");
       try {
-        const response = await createCommentAndRate({ comment: comment, rate: rating, Id: movieId });
-          toast.success("Ihank you !.", {
+        const response = await createCommentAndRate({ comment: comment, rate: rating, movieId: movieData });
+          toast.success("Thank you !.", {
             id: toastId,
           });
           router.reload()
       } catch (e) {
-        toast.success("An error occur.", {
+        toast.error("An error occur.", {
           id: toastId,
         });
       }
@@ -96,7 +97,7 @@ const Movies: NextPage = ({ user, comments, id }: any) => {
             <div className="mx-auto h-full max-w-4xl">
               <nav className="flex items-center justify-between py-3">
                 <Link href="/">
-                <h4 className=" text-xl font-bold text-red-500"> RT</h4>
+                <h4 className=" text-xl font-bold text-red-500">RT</h4>
                 </Link>
                 <div className="flex items-center space-x-2 space-x-2min-h-screen text-sm text-gray-700">
                   <Link href="">ABOUT US</Link>
@@ -133,6 +134,7 @@ const Movies: NextPage = ({ user, comments, id }: any) => {
                 </div>
               </div>
               {user ? (
+                <main>
               <form onSubmit={onSubmit} className="mt-12">
                 <div className="flex items-center justify-between">
                   <h4 className="mb-4 border-l-4 border-red-700 pl-1 font-semibold uppercase text-gray-200">
@@ -159,29 +161,17 @@ const Movies: NextPage = ({ user, comments, id }: any) => {
                   </button>
                 </div>
               </form>
+              </main>
               ) : (<div className="flex items-center justify-between">
                   <h4 className="mb-4 border-l-4 border-red-700 pl-1 font-semibold uppercase text-gray-200">
                     RATE AND REVIEW
                   </h4>
                   <p className="h-[10vh] mb-4 pl-1 font-semibold uppercase text-gray-200">Subscribe to comment and rate !</p>
-                  </div>)}
-              <div className='mt-8 text-gray-100 space-y-4'>
-              { comments && comments.map(comment => (
-                <div>
-                    <div className='flex items-center justify-between'>
-                      <p>{comment.author.name}</p>
-                      <Rating
-                        style={{ maxWidth: 80 }}
-                        value={4}
-                        />
-                    </div>
-                    <p>{comment.content}</p>
-                  </div>
-                  ))}
-                </div>
+              </div>)}
             </div>
           </div>
-
+          
+          <section className="mx-auto mt-60 h-full w-full max-w-4xl py-20">
           <div className='mt-8 text-gray-100 space-y-4'>
             { comments && comments.map(comment => (
               <div>
@@ -196,19 +186,6 @@ const Movies: NextPage = ({ user, comments, id }: any) => {
               </div>
              ))}
           </div>
-
-          <section className="mx-auto mt-60 h-full w-full max-w-4xl py-20">
-            <div className="grid h-full grid-cols-4 gap-x-4 gap-y-8">
-              {discoverMovie
-              .map((movie, index) => (
-                <div>
-                <Link href="/movie/account">
-                  <MovieList rating={movie.vote_average} title={movie.title} image={movie.poster_path} genre={movie.genres} duration={movie.runtime} id={id}/>
-                </Link>
-                <Favorite></Favorite>
-                </div>
-              ))}
-            </div>
           </section>
           <footer>
             <p className="py-4 text-center text-sm font-semibold uppercase text-gray-300">
@@ -258,3 +235,39 @@ function Favorite({ index }: any) {
     </div>
   );
 }
+
+export const validateToken = (token: string) => {
+  const user = jwt.verify(token, "hello");
+  return user;
+};
+
+export const getServerSideProps = async ({ query, req }) => {
+  let user;
+  let authUser;
+  try {
+    user = validateToken(req.cookies.ACCESS_TOKEN);
+    authUser = await prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+      },
+    });
+    console.log({ authUser });
+  } catch (e) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: "/login",
+      },
+    };
+  }
+
+  return {
+    props: { user, authUser },
+  };
+};

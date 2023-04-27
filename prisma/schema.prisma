@@ -64,7 +64,7 @@ model Comment {
     id                String @id @default(cuid())
     authorId          String
     content           String
-    movieId           Int
+    movieId           String
     author            User  @relation(fields: [authorId], references: [id], onDelete: Cascade)
 }
 
