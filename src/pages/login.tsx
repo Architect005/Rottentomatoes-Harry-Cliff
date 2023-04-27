@@ -20,8 +20,10 @@ function LoginPage() {
     async function onSubmit(e: any) {
         e.preventDefault();
         const toastId = toast.loading("loading...");
+        console.log("response");
         try {
             const response = await login({ email, password });
+            console.log({response});
             if (response.status == 201) {
               toast.success("User log succesfully.", {
                 id: toastId,
