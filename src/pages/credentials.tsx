@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { login } from "@/functions/api.request";
 
-function LoginPage() {
+function ChangeCredentials() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const router = useRouter();
@@ -49,7 +49,7 @@ function LoginPage() {
                 </Link>
             </div>
             <div className="w-96">
-                <h4 className="mb-6 text-3xl font-semibold text-gray-100">Sign In</h4>
+                <h4 className="mb-6 text-3xl font-semibold text-gray-100">Change credentials</h4>
                 <form onSubmit={onSubmit}>
                     <div>
                         <label htmlFor="" className="text-gray-100">
@@ -74,18 +74,12 @@ function LoginPage() {
                         />
                     </div>
                     <button className="mt-8 w-full rounded-lg bg-red-800 px-3 py-2.5 font-semibold text-red-100 ">
-                      SIGN IN
+                      CHANGE
                     </button>
-                    <p className="mt-4 text-center text-sm text-gray-100">
-                      Don't have an account ? {" "}
-                      <Link href="/register" className="cursor-pointer text-red-800">
-                        Create an account
-                      </Link>
-                    </p>
                 </form>
             </div>
         </main>
     );
 }
 
-export default LoginPage;
+export default ChangeCredentials;

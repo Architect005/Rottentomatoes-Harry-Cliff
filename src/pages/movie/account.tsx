@@ -4,6 +4,7 @@ import Image from "next/image";
 import { toast } from "react-hot-toast";
 import { Rating } from "@smastrom/react-rating";
 import "@smastrom/react-rating/style.css";
+import { FilterEnum } from "@/functions/filter";
 import { useEffect, useState } from "react";
 import prisma from "@/functions/prisma";
 import { createCommentAndRate, getMovie } from "@/functions/request";
