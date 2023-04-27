@@ -94,7 +94,9 @@ const Movies: NextPage = ({ user, comments, id }: any) => {
           <div className="h-[63vh] w-full bg-white">
             <div className="mx-auto h-full max-w-4xl">
               <nav className="flex items-center justify-between py-3">
+                <Link href="/">
                 <h4 className=" text-xl font-bold text-red-500"> RT</h4>
+                </Link>
                 <div className="flex items-center space-x-2 space-x-2min-h-screen text-sm text-gray-700">
                   <Link href="">ABOUT US</Link>
                   {user ? (
@@ -120,13 +122,13 @@ const Movies: NextPage = ({ user, comments, id }: any) => {
                   />
                 </div>
                 <div className="space-y-4">
-                  <p className="text-xs">2021</p>
-                  <h4 className="text-5xl font-bold">{movieData.title}</h4>
+                  <p className="text-xs">{topMovie[0].release_date}</p>
+                  <h4 className="text-5xl font-bold">{topMovie[0].title}</h4>
                   <small>Action</small>
                   <p className="w-96 text-xs text-gray-800">
-                    Overview
+                    {topMovie[0].overview}
                   </p>
-                  <div></div>
+                  <Favorite></Favorite>
                 </div>
               </div>
               {user ? (
@@ -155,22 +157,27 @@ const Movies: NextPage = ({ user, comments, id }: any) => {
                     Commenter
                   </button>
                 </div>
-              </form>) : (
-                <div className='mt-8 text-gray-100 space-y-4'>
-                { comments && comments.map(comment => (
-                  <div>
-                      <div className='flex items-center justify-between'>
-                        <p>{comment.author.name}</p>
-                        <Rating
-                          style={{ maxWidth: 80 }}
-                          value={4}
-                          />
-                      </div>
-                      <p>{comment.content}</p>
+              </form>
+              ) : (<div className="flex items-center justify-between">
+                  <h4 className="mb-4 border-l-4 border-red-700 pl-1 font-semibold uppercase text-gray-200">
+                    RATE AND REVIEW
+                  </h4>
+                  <p className="h-[10vh] mb-4 pl-1 font-semibold uppercase text-gray-200">Subscribe to comment and rate !</p>
+                  </div>)}
+              <div className='mt-8 text-gray-100 space-y-4'>
+              { comments && comments.map(comment => (
+                <div>
+                    <div className='flex items-center justify-between'>
+                      <p>{comment.author.name}</p>
+                      <Rating
+                        style={{ maxWidth: 80 }}
+                        value={4}
+                        />
                     </div>
-                    ))}
+                    <p>{comment.content}</p>
                   </div>
-                )}
+                  ))}
+                </div>
             </div>
           </div>
 
@@ -193,9 +200,12 @@ const Movies: NextPage = ({ user, comments, id }: any) => {
             <div className="grid h-full grid-cols-4 gap-x-4 gap-y-8">
               {discoverMovie
               .map((movie, index) => (
+                <div>
                 <Link href="/movie/account">
                   <MovieList rating={movie.vote_average} title={movie.title} image={movie.poster_path} genre={movie.genres} duration={movie.runtime} id={id}/>
                 </Link>
+                <Favorite></Favorite>
+                </div>
               ))}
             </div>
           </section>
@@ -229,6 +239,21 @@ function MovieList({ image, title, rating, duration, genre, id}) {
           <small>Vote: {rating*10}%</small>
         </div>
       </div>
+    </div>
+  );
+}
+
+function Favorite({ index }: any) {
+
+  const [state, add] = useState(true);
+
+  let icon: number = 1, y = 0;
+  const adding = (index) => {
+    add(!state);
+  };
+  return (
+    <div className="text-sm font-semibold text-gray-100">
+      <button onClick={adding} className="text-l">❤{state ? "️Add to Favorite": "️Remove from favorite"}</button>
     </div>
   );
 }

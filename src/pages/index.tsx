@@ -7,6 +7,8 @@ import { type NextPage } from "next";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Interface } from "readline";
+import { Identifier } from "typescript";
+import { Session } from "inspector";
 
 const Home: NextPage = ({ user }) => {
 
@@ -55,22 +57,25 @@ const Home: NextPage = ({ user }) => {
         <link rel="icon" href="/favicon.ico"/>
       </Head>
       <main className="min-h-screen bg-gray-800">
-        <div className="h-[60vh] w-full bg-white">
+        <div className="h-[58vh] w-full bg-white">
           <div className="mx-auto h-full max-w-4xl">
             <nav className="flex items-center justify-between py-3">
+              <Link href="/">
               <h4 className=" text-xl font-bold text-red-500"> RT</h4>
+              </Link>
               <div className="flex items-center space-x-2 space-x-2min-h-screen text-sm text-gray-700">
                 <Link href="">ABOUT US</Link>
                 {user ? (
                   <Link href="/login">LOG OUT</Link>
-                ) : (
-                  <Link href="/register">LOG IN/REGISTER</Link>
-                )}
+                  ) : (
+                    <Link href="/register">LOG IN/REGISTER</Link>
+                    )}
               </div>
             </nav>
 
             {/* Hero Section */}
-            <div className="flex  gap-x-10 lg:mt-20">
+            <div className="flex gap-x-5 lg:mt-20 left-0">
+              <SlideMenu></SlideMenu>
               <div className="relative h-80 w-60 flex-none rounded-lg">
                 <div></div>
                 <Image
@@ -81,7 +86,7 @@ const Home: NextPage = ({ user }) => {
                     topratedMovie[0].poster_path
                   }
                   fill
-                />
+                  />
               </div>
               <div className="space-y-4">
                 <p className="text-xs">{topratedMovie[0].release_date}</p>
@@ -91,18 +96,22 @@ const Home: NextPage = ({ user }) => {
                   {topratedMovie[0].overview}
                 </p>
                 <small>Vote: {topratedMovie[0].vote_average*10}%</small>
+                <Favorite></Favorite>
               </div>
             </div>
           </div>
         </div>
 
-        <section className="mx-auto mt-56 h-full w-full max-w-4xl py-12">
+        <section className="mx-auto mt-56 h-full w-full max-w-4xl py-10">
           <div className="grid h-full grid-cols-4 gap-x-4 gap-y-8">
             {discoverMovie
               .map((movie, index) => (
+                <div>
                 <Link href="/movie/account">
                   <MovieList rating={movie.vote_average} title={movie.title} image={movie.poster_path} genre={movie.genres} duration={movie.runtime}/>
                 </Link>
+                <Favorite index={discoverMovie}></Favorite>
+                </div>
               ))}
           </div>
         </section>
@@ -117,6 +126,87 @@ const Home: NextPage = ({ user }) => {
 };
 
 export default Home;
+
+function Favorite({ index }: any) {
+
+  const [state, add] = useState(true);
+
+  let icon: number = 1, y = 0;
+  const adding = (index) => {
+    add(!state);
+  };
+  return (
+    <div className="text-sm font-semibold text-gray-100">
+      <button onClick={adding} className="text-l">❤{state ? "️Add to Favorite": "️Remove from favorite"}</button>
+    </div>
+  );
+}
+
+function SlideMenu ( index ) {
+  interface movie {
+    poster_path? : String;
+    adult? : boolean;
+    overview? : String;
+    release_date? : String;
+    id? : number;
+    vote_average? : number;
+    title? : String;
+    popularity? : number;
+    genre_ids? : number[];
+  }
+
+  const [topratedMovie, setDiscoverMovie] = useState<movie[]>([]);
+  
+  useEffect(() => {
+    getMovie("/discover/movie")
+    .then((res) => (
+      setDiscoverMovie(res.results)
+    ))
+  }, []);
+
+  var sideMenu = document.getElementById('side-menu');
+  const openMenu = async () => {
+      sideMenu.classList.remove('left-[-250px]');
+      sideMenu.classList.add('left-0');
+  };
+  const closeMenu = () => {
+      sideMenu.classList.remove('left-0');
+      sideMenu.classList.add('left-[-250px]');
+  };
+
+
+  if(!topratedMovie[0]) {
+    return <div className='w-full h-screen flex items-center justify-center'>
+      <p className='text-center'>Loading...</p>
+    </div>
+  }
+
+  return (
+  <body>
+    <div id="side-menu" className="fixed top-0 left-[-250px] w-[240px] h-screen z-50 bg-gray-700 p-5
+    flex flex-col space-y-5 text-white duration-300">
+        <a href="javascript:void(0)" className="text-right text-4xl" onClick={closeMenu}>&times;</a>
+        <section>
+        <Image
+          className="rounded"
+          height={80}
+          width={80}
+          alt="Movie image"
+          src={
+            "https://image.tmdb.org/t/p/w500/" + 
+            topratedMovie[0].poster_path
+          }
+        />
+        <a className="text-xs">{topratedMovie[0].title}</a>
+        </section>
+    </div>
+
+    <main className="p-0">
+        <span className="cursor-pointer text-xl" onClick={openMenu}>&#9776;My favorites</span>
+    </main>
+  </body>
+  );
+}
 
 function MovieList({ image, title, rating, duration, genre}) {
   return (
