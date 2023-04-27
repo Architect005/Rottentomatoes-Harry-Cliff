@@ -2,7 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
 import { getMovie } from "@/functions/request";
-import { RoleEnum } from "@/functions/role.enum";
+import { FilterEnum } from "@/functions/filter.ts";
 import { type NextPage } from "next";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
@@ -63,8 +63,9 @@ const Home: NextPage = ({ user }) => {
               <Link href="/">
               <h4 className=" text-xl font-bold text-red-500"> RT</h4>
               </Link>
-              <div className="flex items-center space-x-2 space-x-2min-h-screen text-sm text-gray-700">
+              <div className="flex items-center space-x-4 space-x-2min-h-screen text-sm text-gray-700">
                 <Link href="">ABOUT US</Link>
+                <Link href="/credentials">CHANGE CREDENTIALS</Link>
                 {user ? (
                   <Link href="/login">LOG OUT</Link>
                   ) : (
@@ -75,7 +76,11 @@ const Home: NextPage = ({ user }) => {
 
             {/* Hero Section */}
             <div className="flex gap-x-5 lg:mt-20 left-0">
+              <div className="flex">
               <SlideMenu></SlideMenu>
+              <Filter></Filter>
+              </div>
+
               <div className="relative h-80 w-60 flex-none rounded-lg">
                 <div></div>
                 <Image
@@ -201,10 +206,29 @@ function SlideMenu ( index ) {
         </section>
     </div>
 
-    <main className="p-0">
+    <main className="p-0 space-x-5">
         <span className="cursor-pointer text-xl" onClick={openMenu}>&#9776;My favorites</span>
     </main>
   </body>
+  );
+}
+
+function Filter() {
+  return (
+    <form>
+      <button className="rounded-lg w-20 bg-red-800 px-3 py-1 font-semibold text-red-100 text-xs">
+        SEARCH BY
+      </button>
+      <select
+        //value={}
+        //onChange={}
+        className=" mb-6 px-5 w-20 h-15 appearance-none rounded-md bg-gray-200 text-gray-700 outline-none focus-within:ring-gray-700 focus:ring-2"
+      >
+        <option value={FilterEnum.Date}>Date</option>
+        <option value={FilterEnum.Director}>Director</option>
+        <option value={FilterEnum.Genre}>Genre</option>
+      </select>
+    </form>
   );
 }
 
