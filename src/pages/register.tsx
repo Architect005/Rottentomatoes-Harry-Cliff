@@ -44,14 +44,7 @@ function RegisterPage() {
         <main className="flex h-screen w-full items-center justify-center bg-gray-800">
             <div className="h-screen py-20 px-5">
                 <Link href="/">
-                    <>
-                        <Image
-                        width={40}
-                        height={40}
-                        alt="logo"
-                        src="/index.jpg"
-                        />
-                    </>
+                <h4 className=" text-xl font-bold text-red-500"> RT</h4>
                 </Link>
             </div>
             <div className="w-96">
