@@ -35,7 +35,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       }
     );
     
-    console.log({  });
     res.setHeader(
       "Set-Cookie",
       cookie.serialize("ACCESS_TOKEN", token, {
@@ -47,7 +46,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       })
       );
       
-      res.json({ status: 200, user });
+      res.json({ status: 201, user });
     } else {
     res.status(401);
     res.json({ error: "Email or Password is wrong" });
