@@ -1,11 +1,13 @@
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
+import jwt from "jsonwebtoken";
 import { getMovie } from "@/functions/request";
 import { FilterEnum } from "@/functions/filter.ts";
 import { type NextPage } from "next";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import prisma from "@/functions/prisma";
 import { Interface } from "readline";
 import { Identifier } from "typescript";
 import { Session } from "inspector";
@@ -49,6 +51,12 @@ const Home: NextPage = ({ user }) => {
     </div>
   }
 
+  function disconnect ({user}) {
+    return (
+      user = null
+    );
+  }
+
   return (
     <>
       <Head>
@@ -67,10 +75,12 @@ const Home: NextPage = ({ user }) => {
                 <Link href="">ABOUT US</Link>
                 <Link href="/credentials">CHANGE CREDENTIALS</Link>
                 {user ? (
+                  <button onClick={disconnect}>
                   <Link href="/login">LOG OUT</Link>
+                  </button>
                   ) : (
-                    <Link href="/register">LOG IN/REGISTER</Link>
-                    )}
+                  <Link href="/register">LOG IN/REGISTER</Link>
+                )}
               </div>
             </nav>
 
@@ -253,3 +263,39 @@ function MovieList({ image, title, rating, duration, genre}) {
     </div>
   );
 }
+
+export const validateToken = (token: string) => {
+  const user = jwt.verify(token, "hello");
+  return user;
+};
+
+export const getServerSideProps = async ({ query, req }) => {
+  let user;
+  let authUser;
+  try {
+    user = validateToken(req.cookies.ACCESS_TOKEN);
+    authUser = await prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+      },
+    });
+    console.log({ authUser });
+  } catch (e) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: "/login",
+      },
+    };
+  }
+
+  return {
+    props: { user, authUser },
+  };
+};
