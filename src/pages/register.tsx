@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { register } from "@/functions/api.request";

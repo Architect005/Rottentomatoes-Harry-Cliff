@@ -22,6 +22,7 @@ function LoginPage() {
         const toastId = toast.loading("loading...");
         console.log("response");
         try {
+            console.log(email, password);
             const response = await login({ email, password });
             console.log({response});
             if (response.status == 201) {
@@ -30,12 +31,14 @@ function LoginPage() {
               });
               router.push("/");
             }
+            if (response.status == 422) {
+                toast.error("Email or password incorrect", {
+                    id: toastId,
+                });
+            } 
         } catch (e) {
             console.error(e);
-            toast.success("User can't", {
-            id: toastId,
-        });
-      }
+        }
     }
 
     return(

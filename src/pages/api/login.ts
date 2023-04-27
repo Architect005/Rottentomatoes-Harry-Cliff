@@ -6,6 +6,7 @@ import prisma from "@/functions/prisma";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { email, password } = req.body;
+  console.log(req.body);
 
   const user = await prisma.user.findUnique({
     where: {
@@ -13,16 +14,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     },
   });
 
+  console.log(user);
+
   if (!user) {
     res.json({ status: 422, message: "You don't have an account." });
   }
 
   const isMatched = await argon2.verify(
-    user.password,
+    user!.password,
     password as unknown as string
   );
   if (user && isMatched) {
-    console.log({ isMatched });
+    //console.log({ isMatched });
     const token = jwt.sign(
       {
         id: user.id,
@@ -44,7 +47,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
       })
-      );
+    );
       
       res.json({ status: 201, user });
     } else {
