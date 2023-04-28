@@ -27,19 +27,19 @@ function CreateAdmin() {
     }
 
     async function onSubmit(e: any) {
-      e.preventDefault();
+//      e.preventDefault();
       const toastId = toast.loading("loading...");
       try {
         const response = await createAdmin({ name, email, password });
         if (response.status == 201) {
-          toast.success("User is created succesfully.", {
+          toast.success("Admin is created succesfully.", {
             id: toastId,
           });
-          router.push("/admin/user");
+//          router.push("/admin/user");
         }
       } catch (e) {
         console.error(e);
-        toast.success("Utilisateur existe déjà.", {
+        toast.success("Already exist.", {
           id: toastId,
         });
       }

@@ -51,6 +51,7 @@ export default function OneUser({ user }: any) {
         </div>
 
         <div>
+          <form>
             <div>
               <label htmlFor="" className="text-gray-700">
                 Name
