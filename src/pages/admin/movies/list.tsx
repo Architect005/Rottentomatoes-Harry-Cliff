@@ -136,7 +136,7 @@ export const getServerSideProps = async ({ query, req }) => {
 
   const moveList = await prisma.movie.findMany({
     select: {
-      Id: true,
+      id: true,
       title: true,
       image: true,
     },
