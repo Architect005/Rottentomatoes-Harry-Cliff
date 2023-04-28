@@ -14,3 +14,4 @@ export function getMovie(uri: string) {
 export function createCommentAndRate(data: { comment: string; rate: number; movieId: string}) {
   return fetcher("/create-comment", data);
 }
+

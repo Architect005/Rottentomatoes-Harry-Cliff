@@ -1,13 +1,14 @@
 import Link from "next/link";
-import Image from "next/image";
 import { toast } from "react-hot-toast";
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { login } from "@/functions/api.request";
+import { validateToken } from "@/functions/api.request";
+import { editUser } from "@/functions/api.request";
+import prisma from "@/functions/prisma";
 
-function ChangeCredentials() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+function ChangeCredentials({user, oneUser}: any) {
+    const [email, setEmail] = useState(oneUser?.email as unknown as string);
+    const [password, setPassword] = useState(oneUser?.password as unknown as string);
     const router = useRouter();
 
     function onChangeEmail(e: any) {
@@ -23,21 +24,19 @@ function ChangeCredentials() {
         console.log("response");
         try {
             console.log(email, password);
-            const response = await login({ email, password });
+            const response = await editUser({ id: oneUser.id, email, password });
             console.log({response});
             if (response.status == 201) {
-              toast.success("User log succesfully.", {
+              toast.success("Credentials changed succesfully.", {
                 id: toastId,
               });
               router.push("/");
             }
-            if (response.status == 422) {
-                toast.error("Email or password incorrect", {
-                    id: toastId,
-                });
-            } 
         } catch (e) {
             console.error(e);
+            toast.success("Can't update credentials.", {
+              id: toastId,
+            });
         }
     }
 
@@ -83,3 +82,26 @@ function ChangeCredentials() {
 }
 
 export default ChangeCredentials;
+
+/*
+export const getServerSideProps = async ({ query, req }) => {
+  let user;
+  let oneUser;
+
+    user = validateToken(req.cookies.ACCESS_TOKEN);
+    oneUser = await prisma.user.findUnique({
+      where: {
+        id: req.id as unknown as string,
+      },
+      select: {
+        id: true,
+        email: true,
+        password: true,
+      },
+    });
+
+  return {
+    props: { user, oneUser },
+  };
+};
+*/

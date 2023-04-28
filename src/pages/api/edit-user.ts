@@ -1,9 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/functions/prisma";
-import * as argon2 from "argon2";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { id, name, email, role } = req.body;
+  const { id, name, email } = req.body;
 
   try {
     await prisma.user.update({
@@ -13,16 +12,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       data: {
         name: name as unknown as string,
         email: email as unknown as string,
-        role: role as unknown as string,
       },
     });
+    console.log(id);
   } catch (e) {
     res.status(401);
-    res.json({ error: "Email has been taken." });
+    res.json({ error: "Something went wrong." });
     return;
   }
-
-  res.json({ status: 201, message: "User is updated succesfully." });
+  return res.json({ status: 201, message: "User is updated succesfully." });
 };
 
 export default handler;

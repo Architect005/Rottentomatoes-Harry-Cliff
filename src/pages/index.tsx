@@ -1,14 +1,13 @@
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
-import jwt from "jsonwebtoken";
+import { validateToken } from "@/functions/api.request";
 import { getMovie } from "@/functions/request";
-import { FilterEnum } from "@/functions/filter.ts";
+import { FilterEnum } from "@/functions/filter";
 import { type NextPage } from "next";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import prisma from "@/functions/prisma";
-import { Interface } from "readline";
 import { Identifier } from "typescript";
 import { Session } from "inspector";
 
@@ -45,16 +44,16 @@ const Home: NextPage = ({ user }) => {
     })
   }, []);
 
+  function disconnect() {
+    return(
+      !user
+    );
+  };
+
   if(!topratedMovie[0]) {
     return <div className='w-full h-screen flex items-center justify-center'>
       <p className='text-center'>Loading...</p>
     </div>
-  }
-
-  function disconnect ({user}) {
-    return (
-      user = null
-    );
   }
 
   return (
@@ -72,7 +71,7 @@ const Home: NextPage = ({ user }) => {
               <h4 className=" text-xl font-bold text-red-500"> RT</h4>
               </Link>
               <div className="flex items-center space-x-4 space-x-2min-h-screen text-sm text-gray-700">
-                <Link href="">ABOUT US</Link>
+                <Link href="/us">ABOUT US</Link>
                 <Link href="/credentials">CHANGE CREDENTIALS</Link>
                 {user ? (
                   <button onClick={disconnect}>
@@ -235,7 +234,8 @@ function Filter() {
         className=" mb-6 px-5 w-20 h-15 appearance-none rounded-md bg-gray-200 text-gray-700 outline-none focus-within:ring-gray-700 focus:ring-2"
       >
         <option value={FilterEnum.Date}>Date</option>
-        <option value={FilterEnum.Director}>Director</option>
+        <option value={FilterEnum.Director}>Director
+        </option>
         <option value={FilterEnum.Genre}>Genre</option>
       </select>
     </form>
@@ -263,11 +263,6 @@ function MovieList({ image, title, rating, duration, genre}) {
     </div>
   );
 }
-
-export const validateToken = (token: string) => {
-  const user = jwt.verify(token, "hello");
-  return user;
-};
 
 export const getServerSideProps = async ({ query, req }) => {
   let user;
