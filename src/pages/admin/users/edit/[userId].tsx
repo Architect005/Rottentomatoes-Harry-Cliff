@@ -5,11 +5,13 @@ import { RoleEnum } from "@/functions/role.enum";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { toast } from "react-hot-toast";
+import { createAdmin, editUser } from "@/functions/api.request";
 
-export default function OneUser({ user }: any) {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+export default function EditOneUser({ user, oneUser }: any) {
+  const [name, setName] = useState(oneUser?.name as unknown as string);
+  const [email, setEmail] = useState(oneUser?.email as unknown as string);
+  const [role, setRole] = useState(oneUser?.role as unknown as string);
+
   const router = useRouter();
 
   function onChangeName(e: any) {
@@ -20,8 +22,27 @@ export default function OneUser({ user }: any) {
     setEmail(e.target.value);
   }
 
-  function onChnagePassword(e: any) {
-    setPassword(e.target.value);
+  function onChangeRole(e: any) {
+    setRole(e.target.value);
+  }
+
+  async function onSubmit(e: any) {
+    e.preventDefault();
+    const toastId = toast.loading("loading...");
+    try {
+      const response = await editUser({ id: oneUser.id, name, email, role });
+      if (response.status == 201) {
+        toast.success("User is updated succesfully.", {
+          id: toastId,
+        });
+        router.push("/admin/user");
+      }
+    } catch (e) {
+      console.error(e);
+      toast.success("Email has been taken.", {
+        id: toastId,
+      });
+    }
   }
 
   return (
@@ -51,6 +72,7 @@ export default function OneUser({ user }: any) {
         </div>
 
         <div>
+          <form onSubmit={onSubmit} className="grid grid-cols-4 gap-x-4">
             <div>
               <label htmlFor="" className="text-gray-700">
                 Name
@@ -76,15 +98,18 @@ export default function OneUser({ user }: any) {
             </div>
             <div>
               <label htmlFor="" className="text-gray-700">
-                Password
+                Role
               </label>
-              <input
-                value={password}
-                onChange={onChnagePassword}
-                type="password"
+              <select
+                value={role}
+                onChange={onChangeRole}
                 className=" mb-6 w-full appearance-none rounded-md bg-gray-200 px-2 py-2.5 text-gray-700 outline-none focus-within:ring-gray-700 focus:ring-2"
-              />
+              >
+                <option value={RoleEnum.Admin}>Admin</option>
+                <option value={RoleEnum.User}>User</option>
+              </select>
             </div>
+
             <button className="mb-6 mt-6 w-full rounded-lg bg-red-800 px-3 py-2.5 font-semibold text-red-100 ">
               SAVE
             </button>
@@ -97,10 +122,21 @@ export default function OneUser({ user }: any) {
 
 export const getServerSideProps = async ({ query, req }) => {
   let user;
-  console.log(req.query);
+  let oneUser;
 
   try {
     user = validateToken(req.cookies.ACCESS_TOKEN);
+    oneUser = await prisma.user.findUnique({
+      where: {
+        id: query.userId as unknown as string,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+      },
+    });
   } catch (e) {
     return {
       redirect: {
@@ -111,6 +147,6 @@ export const getServerSideProps = async ({ query, req }) => {
   }
 
   return {
-    props: { user },
+    props: { user, oneUser },
   };
 };
