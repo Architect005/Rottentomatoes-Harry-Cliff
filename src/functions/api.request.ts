@@ -75,6 +75,10 @@ export function createCommentAndRate(data: { authorId: string; movieId: string; 
   return fetcher("/create-comment", data);
 }
 
+export function addFavorite(data: { authorId: string, movieId: number }) {
+  return fetcher("/add-favorite", data);
+}
+
 export function logout() {
   return fetcher("/logout")
 }
