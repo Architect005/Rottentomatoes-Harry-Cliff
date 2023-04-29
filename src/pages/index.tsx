@@ -10,9 +10,10 @@ import prisma from "@/functions/prisma";
 import { RoleEnum } from "@/functions/role.enum";
 import { Identifier } from "typescript";
 import { Session } from "inspector";
+import { validateToken } from "@/functions/api.request";
 
 const Home: NextPage = ({ user }) => {
-
+  console.log(user);
   interface movie {
     poster_path? : String;
     adult? : boolean;
@@ -70,11 +71,11 @@ const Home: NextPage = ({ user }) => {
               <div className="flex items-center space-x-4 space-x-2min-h-screen text-sm text-gray-700">
                 <Link href="/us">ABOUT US</Link>
                 {user ? (
-                  <div>
+                  <div className="flex space-x-3">
+                  <Link href="/credentials">CREDENTIALS</Link>
                   <button onClick={disconnect}>
                   <Link href="/login">LOG OUT</Link>
                   </button>
-                  <Link href="/credentials">CREDENTIALS</Link>
                   </div>
                   ) : (
                   <Link href="/register">LOG IN/REGISTER</Link>
@@ -141,7 +142,7 @@ const Home: NextPage = ({ user }) => {
 
 export default Home;
 
-function Favorite({ index }: any) {
+function Favorite({ movieId }: any) {
 
   const [state, add] = useState(true);
 
@@ -156,7 +157,7 @@ function Favorite({ index }: any) {
   );
 }
 
-function SlideMenu ( index ) {
+function SlideMenu ( movieId ) {
   interface movie {
     poster_path? : String;
     adult? : boolean;
@@ -281,14 +282,6 @@ export const getServerSideProps = async ({ query, req }) => {
         role: true,
       },
     });
-    if(authUser.role != RoleEnum.User) {
-      return {
-        redirect: {
-          permanent: false,
-          destination: "/401",
-        },
-      };
-    }
     console.log({ authUser });
   } catch (e) {
     user = null;
