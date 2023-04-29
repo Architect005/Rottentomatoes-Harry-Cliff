@@ -28,7 +28,7 @@ export default function OneUser({ user }: any) {
     <main className="flex h-screen w-full  flex-1">
       <nav className="h-full w-80 bg-gray-800">
         <div className="space-y-6 px-6 py-6">
-          <h4 className="text-xl font-bold text-red-800 ">TM</h4>
+          <h4 className="text-xl font-bold text-red-800 ">Admin</h4>
           <div className="space-y-4">
             <Link
               href="/admin/movie"
@@ -102,11 +102,31 @@ export const getServerSideProps = async ({ query, req }) => {
 
   try {
     user = validateToken(req.cookies.ACCESS_TOKEN);
+
+    const oneUser = await prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+      },
+    });
+    if(oneUser.role !== RoleEnum.Admin) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: "/401",
+        },
+      };
+    }
   } catch (e) {
     return {
       redirect: {
         permanent: false,
-        destination: "/login",
+        destination: "/admin/",
       },
     };
   }

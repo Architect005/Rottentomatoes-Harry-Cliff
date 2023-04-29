@@ -1,9 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
+import {validateToken} from '@/functions/auth';
+import prisma from "@/functions/prisma";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { toast } from "react-hot-toast";
 import { createAdmin } from "@/functions/api.request";
+import { RoleEnum } from "@/functions/role.enum";
 
 function CreateAdmin() {
     const [name, setName] = useState("");
@@ -101,5 +104,54 @@ function CreateAdmin() {
         </main>
     );
 }
+
+export const getServerSideProps = async ({ query, req }) => {
+  let user;
+
+  const moveList = await prisma.movie.findMany({
+    select: {
+      id: true,
+      title: true,
+      image: true,
+    },
+  });
+
+  try {
+    user = validateToken(req.cookies.ACCESS_TOKEN);
+
+    const oneUser = await prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+      },
+    });
+    console.log(oneUser?.role);
+    console.log(RoleEnum.SuperAdmin);
+    if(oneUser.role != RoleEnum.SuperAdmin) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: "/401",
+        },
+      };
+    }
+  } catch (e) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: "/superadmin/",
+      },
+    };
+  }
+
+  return {
+    props: { user, moveList },
+  };
+};
 
 export default CreateAdmin;

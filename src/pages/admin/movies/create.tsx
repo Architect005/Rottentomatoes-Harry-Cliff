@@ -42,7 +42,7 @@ export default function OneUser({ user }: any) {
         toast.success("Movie is created succesfully.", {
           id: toastId,
         });
-        router.push("/admin/movie");
+        router.push("/admin/movies/list");
       }
     } catch (e) {
       console.error(e);
@@ -59,13 +59,13 @@ export default function OneUser({ user }: any) {
           <h4 className="text-xl font-bold text-red-800 ">TM</h4>
           <div className="space-y-4">
             <Link
-              href="/admin/movie"
+              href="/admin/movies"
               className=" block w-full rounded-lg bg-gray-700 px-3 py-3 text-gray-100"
             >
               Movie
             </Link>
             <Link
-              href="/admin/user"
+              href="/admin/users"
               className=" block w-full rounded-lg bg-gray-700 px-3 py-3 text-gray-100"
             >
               User
@@ -75,7 +75,7 @@ export default function OneUser({ user }: any) {
       </nav>
       <section className="w-full p-16">
         <div className="mb-12 flex items-center justify-between">
-          <h4 className="text-xl font-bold text-gray-800">Create User</h4>
+          <h4 className="text-xl font-bold text-gray-800">Add film</h4>
         </div>
 
         <div>
@@ -143,11 +143,31 @@ export const getServerSideProps = async ({ query, req }) => {
 
   try {
     user = validateToken(req.cookies.ACCESS_TOKEN);
+
+    const oneUser = await prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+      },
+    });
+    if(oneUser.role !== RoleEnum.Admin) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: "/401",
+        },
+      };
+    }
   } catch (e) {
     return {
       redirect: {
         permanent: false,
-        destination: "/login",
+        destination: "/admin/",
       },
     };
   }
