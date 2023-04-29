@@ -48,9 +48,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         secure: process.env.NODE_ENV === "production",
       })
     );
-      
-      res.json({ status: 201, user });
-    } else {
+
+    res.json({ status: 201, user });
+
+  } else {
     res.status(401);
     res.json({ error: "Email or Password is wrong" });
   }

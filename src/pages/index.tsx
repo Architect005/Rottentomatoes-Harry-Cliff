@@ -11,8 +11,12 @@ import { RoleEnum } from "@/functions/role.enum";
 import { Identifier } from "typescript";
 import { Session } from "inspector";
 import { validateToken } from "@/functions/api.request";
+import { toast } from "react-hot-toast";
+import { logout } from "@/functions/api.request";
 
 const Home: NextPage = ({ user }) => {
+  const router = useRouter();
+
   console.log(user);
   interface movie {
     poster_path? : String;
@@ -42,10 +46,19 @@ const Home: NextPage = ({ user }) => {
     })
   }, []);
 
-  function disconnect() {
-    return(
-      !user
-    );
+  async function disconnect() {
+    const toastId = toast.loading("loading...");
+    try {
+        const response = await logout();
+        if (response.status == 201) {
+          toast.success("User logout succesfully.", {
+            id: toastId,
+          });
+          router.push("/login");
+        }
+      } catch (e) {
+        console.error(e);
+      }
   };
 
   if(!topratedMovie[0]) {
