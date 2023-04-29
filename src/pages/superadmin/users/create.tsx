@@ -118,6 +118,7 @@ export const getServerSideProps = async ({ query, req }) => {
 
   try {
     user = validateToken(req.cookies.ACCESS_TOKEN);
+    console.log(user);
 
     const oneUser = await prisma.user.findUnique({
       where: {
@@ -130,8 +131,6 @@ export const getServerSideProps = async ({ query, req }) => {
         role: true,
       },
     });
-    console.log(oneUser?.role);
-    console.log(RoleEnum.SuperAdmin);
     if(oneUser.role != RoleEnum.SuperAdmin) {
       return {
         redirect: {
