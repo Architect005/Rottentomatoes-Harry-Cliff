@@ -15,6 +15,7 @@ export function register(data: {
   return fetcher("/register", data);
 }
 
+
 export function login(data: {email: string; password: string}) {
   return fetcher("/login", data);
 }
@@ -32,6 +33,14 @@ export function editUser(data: {
   name: string;
   email: string;
   role: string;
+}) {
+  return fetcher("/edit-user", data);
+}
+
+export function changeUser(data: {
+  name: string;
+  email: string;
+  password: string;
 }) {
   return fetcher("/edit-user", data);
 }
