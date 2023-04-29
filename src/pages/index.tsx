@@ -69,11 +69,13 @@ const Home: NextPage = ({ user }) => {
               </Link>
               <div className="flex items-center space-x-4 space-x-2min-h-screen text-sm text-gray-700">
                 <Link href="/us">ABOUT US</Link>
-                <Link href="/credentials">CREDENTIALS</Link>
                 {user ? (
+                  <div>
                   <button onClick={disconnect}>
                   <Link href="/login">LOG OUT</Link>
                   </button>
+                  <Link href="/credentials">CREDENTIALS</Link>
+                  </div>
                   ) : (
                   <Link href="/register">LOG IN/REGISTER</Link>
                 )}
@@ -289,12 +291,8 @@ export const getServerSideProps = async ({ query, req }) => {
     }
     console.log({ authUser });
   } catch (e) {
-    return {
-      redirect: {
-        permanent: false,
-        destination: "/login",
-      },
-    };
+    user = null;
+    authUser = null;
   }
 
   return {

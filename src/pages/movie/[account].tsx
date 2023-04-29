@@ -94,7 +94,7 @@ const Movies: NextPage = ({ user, comments, id }: any) => {
           <link rel="icon" href="/favicon.ico"/>
         </Head>
         <main className="min-h-screen bg-gray-800">
-          <div className="h-[63vh] w-full bg-white">
+          <div className="h-[60vh] w-full bg-white">
             <div className="mx-auto h-full max-w-4xl">
               <nav className="flex items-center justify-between py-3">
                 <Link href="/">
