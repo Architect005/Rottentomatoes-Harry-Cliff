@@ -122,7 +122,7 @@ const Home: NextPage = ({ user }) => {
                   {topratedMovie[0].overview}
                 </p>
                 <small>Vote: {topratedMovie[0].vote_average*10}%</small>
-                <Favorite></Favorite>
+                <Favorite movieId={topratedMovie[0].id} user={user?.id}></Favorite>
               </div>
             </div>
           </div>
@@ -136,7 +136,7 @@ const Home: NextPage = ({ user }) => {
                 <Link href={"/movie/" + movie.id}>
                   <MovieList rating={movie.vote_average} title={movie.title} image={movie.poster_path} genre={movie.genres} duration={movie.runtime}/>
                 </Link>
-                <Favorite movieId={movie.id} user={user.id}></Favorite>
+                <Favorite movieId={movie.id} user={user?.id}></Favorite>
                 </div>
               ))}
               
@@ -156,7 +156,8 @@ export default Home;
 
 function Favorite({ movieId, user }: any) {
 
-  var state = true;
+  const [ asfavorite, setAsFavorite ] = useState(true);
+
   async function onSubmit(e) {
     e.preventDefault();
     const toastId = toast.loading("loading...");
@@ -165,6 +166,7 @@ function Favorite({ movieId, user }: any) {
         toast.success("Thank you !.", {
           id: toastId,
         });
+        setAsFavorite(false);
         //router.reload()
       } catch (e) {
         toast.error("An error occur.", {
@@ -175,7 +177,7 @@ function Favorite({ movieId, user }: any) {
 
   return (
     <div className="text-sm font-semibold text-gray-100">
-      <button onClick={onSubmit} className="text-l">❤{state ? "️Add to Favorite": "️Remove from favorite"}</button>
+      <button onClick={onSubmit} className="text-l">❤{asfavorite ? "️Add to Favorite": "️Remove from favorite"}</button>
     </div>
   );
 }
