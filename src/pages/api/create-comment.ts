@@ -1,5 +1,4 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { validateToken } from "@/functions/api.request";
 import prisma from "@/functions/prisma";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -7,15 +6,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   let comment;
 
-  const user = validateToken(req.cookies.ACCESS_TOKEN);
-
   try {
       comment = await prisma.comment.create({
       data: {
-        authorId: authorId as string,
         content: content as string,
-        rate: rate as number,
-        movieId: movieId as number,
+        rate: Number(rate),
+        movieId: Number(movieId),
         author: {
           connect: {
             id: user.id,
@@ -23,8 +19,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         }
       },
     });
+    console.log(comment)
   } catch (e) {
-    console.log(res)
+    console.log(e)
     res.status(401);
     res.json({ error: "Comment didn't go well." });
     return;
