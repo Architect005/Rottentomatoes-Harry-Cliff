@@ -4,13 +4,14 @@ import prisma from "@/functions/prisma";
 import Image from 'next/image';
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { RoleEnum } from "@/functions/role.enum";
 
-export default function MovieList({ user, moveList }: any) {
+export default function MovieList({ user, movieList }: any) {
   return (
     <main className="flex h-screen w-full  flex-1">
       <nav className="h-full w-80 bg-gray-800">
         <div className="space-y-6 px-6 py-6">
-          <h4 className="text-xl font-bold text-red-800 ">TM</h4>
+          <h4 className="text-xl font-bold text-red-800 ">Admin</h4>
           <div className="space-y-4">
             <Link
               href="/admin/movie"
@@ -19,7 +20,7 @@ export default function MovieList({ user, moveList }: any) {
               Movie
             </Link>
             <Link
-              href="/admin/user"
+              href="/admin/users/list"
               className=" block w-full rounded-lg bg-gray-700 px-3 py-3 text-gray-100"
             >
               User
@@ -31,7 +32,7 @@ export default function MovieList({ user, moveList }: any) {
         <div className="flex items-center justify-between">
           <h4 className="text-xl font-bold text-gray-800">Movie</h4>
           <Link
-            href="/admin/movie/create"
+            href="/admin/movies/create"
             className="ml mt-4 rounded-lg bg-red-800 px-3 py-2.5 font-semibold text-red-100"
           >
             Créer
@@ -63,7 +64,7 @@ export default function MovieList({ user, moveList }: any) {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 bg-white ">
-                    {moveList.map((movie) => (
+                    {movieList.map((movie) => (
                     <tr key={movie.Id}>
                       <td className="whitespace-nowrap px-4 py-4 text-sm font-medium text-gray-700">
                       <div className="relative w-14 aspect-square flex-none rounded-full">
@@ -144,11 +145,32 @@ export const getServerSideProps = async ({ query, req }) => {
 
   try {
     user = validateToken(req.cookies.ACCESS_TOKEN);
+
+    const oneUser = await prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+      },
+    });
+    if(oneUser.role !== RoleEnum.Admin) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: "/401",
+        },
+      };
+    }
+
   } catch (e) {
     return {
       redirect: {
         permanent: false,
-        destination: "/login",
+        destination: "/admin/",
       },
     };
   }

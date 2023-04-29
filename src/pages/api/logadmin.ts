@@ -24,7 +24,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     user!.password,
     password as unknown as string
   );
-  if (user && isMatched && user.role === 'user') {
+  if (user && isMatched && user.role === 'admin') {
     console.log({ isMatched });
     const token = jwt.sign(
       {

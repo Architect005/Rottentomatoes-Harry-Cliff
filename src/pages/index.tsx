@@ -8,6 +8,7 @@ import { type NextPage } from "next";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import prisma from "@/functions/prisma";
+import { RoleEnum } from "@/functions/role.enum";
 import { Identifier } from "typescript";
 import { Session } from "inspector";
 
@@ -127,6 +128,7 @@ const Home: NextPage = ({ user }) => {
                 <Favorite index={discoverMovie}></Favorite>
                 </div>
               ))}
+              
           </div>
         </section>
         <footer>
@@ -280,6 +282,14 @@ export const getServerSideProps = async ({ query, req }) => {
         role: true,
       },
     });
+    if(authUser.role != RoleEnum.User) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: "/401",
+        },
+      };
+    }
     console.log({ authUser });
   } catch (e) {
     return {
