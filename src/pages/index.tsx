@@ -1,13 +1,13 @@
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
-import { validateToken } from "@/functions/api.request";
 import { getMovie } from "@/functions/request";
 import { FilterEnum } from "@/functions/filter";
 import { type NextPage } from "next";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import prisma from "@/functions/prisma";
+import { validateToken } from "@/functions/api.request";
 import { Identifier } from "typescript";
 import { Session } from "inspector";
 
@@ -27,9 +27,6 @@ const Home: NextPage = ({ user }) => {
 
   const [topratedMovie, setTopratedMovie] = useState<movie[]>([]);
   const [discoverMovie, setDiscoverMovie] = useState([]);
-
-  const router = useRouter();
-  const { movieId } = router.query;
 
   useEffect(() => {
     getMovie("/discover/movie")
@@ -72,7 +69,7 @@ const Home: NextPage = ({ user }) => {
               </Link>
               <div className="flex items-center space-x-4 space-x-2min-h-screen text-sm text-gray-700">
                 <Link href="/us">ABOUT US</Link>
-                <Link href="/credentials">CHANGE CREDENTIALS</Link>
+                <Link href="/credentials">CREDENTIALS</Link>
                 {user ? (
                   <button onClick={disconnect}>
                   <Link href="/login">LOG OUT</Link>
@@ -121,7 +118,7 @@ const Home: NextPage = ({ user }) => {
             {discoverMovie
               .map((movie, index) => (
                 <div>
-                <Link href="/movie/account">
+                <Link href={"/movie/" + movie.id}>
                   <MovieList rating={movie.vote_average} title={movie.title} image={movie.poster_path} genre={movie.genres} duration={movie.runtime}/>
                 </Link>
                 <Favorite index={discoverMovie}></Favorite>
@@ -234,9 +231,10 @@ function Filter() {
         className=" mb-6 px-5 w-20 h-15 appearance-none rounded-md bg-gray-200 text-gray-700 outline-none focus-within:ring-gray-700 focus:ring-2"
       >
         <option value={FilterEnum.Date}>Date</option>
-        <option value={FilterEnum.Director}>Director
-        </option>
-        <option value={FilterEnum.Genre}>Genre</option>
+        <option value={FilterEnum.Genre}>Action</option>
+        <option value={FilterEnum.Genre}>Comedy</option>
+        <option value={FilterEnum.Genre}>Horror</option>
+        <option value={FilterEnum.Director}>Director</option>
       </select>
     </form>
   );
