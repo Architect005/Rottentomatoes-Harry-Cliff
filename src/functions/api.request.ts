@@ -19,6 +19,14 @@ export function login(data: {email: string; password: string}) {
   return fetcher("/login", data);
 }
 
+export function changeUser(data: {
+  id: string;
+  email: string;
+  password: string;
+}) {
+  return fetcher("/edit-user", data);
+}
+
 export function editUser(data: {
   id: string;
   name: string;
