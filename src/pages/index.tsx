@@ -7,12 +7,11 @@ import { type NextPage } from "next";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import prisma from "@/functions/prisma";
-import { RoleEnum } from "@/functions/role.enum";
-import { Identifier } from "typescript";
-import { Session } from "inspector";
+import { addFavorite } from "@/functions/api.request";
 import { validateToken } from "@/functions/api.request";
 import { toast } from "react-hot-toast";
 import { logout } from "@/functions/api.request";
+import movie from "./api/movie";
 
 const Home: NextPage = ({ user }) => {
   const router = useRouter();
@@ -137,7 +136,7 @@ const Home: NextPage = ({ user }) => {
                 <Link href={"/movie/" + movie.id}>
                   <MovieList rating={movie.vote_average} title={movie.title} image={movie.poster_path} genre={movie.genres} duration={movie.runtime}/>
                 </Link>
-                <Favorite index={discoverMovie}></Favorite>
+                <Favorite movieId={movie.id} user={user.id}></Favorite>
                 </div>
               ))}
               
@@ -155,17 +154,28 @@ const Home: NextPage = ({ user }) => {
 
 export default Home;
 
-function Favorite({ movieId }: any) {
+function Favorite({ movieId, user }: any) {
 
-  const [state, add] = useState(true);
+  var state = true;
+  async function onSubmit(e) {
+    e.preventDefault();
+    const toastId = toast.loading("loading...");
+    try {
+      const response = await addFavorite({ authorId: user, movieId: movieId });
+        toast.success("Thank you !.", {
+          id: toastId,
+        });
+        //router.reload()
+      } catch (e) {
+        toast.error("An error occur.", {
+          id: toastId,
+        });
+      }
+  }
 
-  let icon: number = 1, y = 0;
-  const adding = (index) => {
-    add(!state);
-  };
   return (
     <div className="text-sm font-semibold text-gray-100">
-      <button onClick={adding} className="text-l">❤{state ? "️Add to Favorite": "️Remove from favorite"}</button>
+      <button onClick={onSubmit} className="text-l">❤{state ? "️Add to Favorite": "️Remove from favorite"}</button>
     </div>
   );
 }
@@ -201,7 +211,6 @@ function SlideMenu ( movieId ) {
       sideMenu.classList.remove('left-0');
       sideMenu.classList.add('left-[-250px]');
   };
-
 
   if(!topratedMovie[0]) {
     return <div className='w-full h-screen flex items-center justify-center'>
