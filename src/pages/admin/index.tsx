@@ -1,21 +1,51 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import { useRouter } from "next/router";
+import { toast } from "react-hot-toast";
+import { logadmin } from "@/functions/api.request";
 
 function AdminLog() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const router = useRouter();
 
-    function onChangeEmail() {
+    function onChangeEmail(e: any) {
+        setEmail(e.target.value);
     }
-    function onChangePassword() {
+    function onChangePassword(e: any) {
+        setPassword(e.target.value);
+    }
+
+    async function onSubmit(e: any) {
+        e.preventDefault();
+        const toastId = toast.loading("loading...");
+        console.log("response");
+        try {
+            console.log(email, password);
+            const response = await logadmin({ email, password });
+            console.log({response});
+            if (response.status == 201) {
+              toast.success("User log succesfully.", {
+                id: toastId,
+              });
+              router.push("/admin/users/list");
+            }
+            if (response.status == 422) {
+                toast.error("Email or password incorrect", {
+                    id: toastId,
+                });
+            } 
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     return(
         <main className="flex h-screen w-full items-center justify-center bg-gray-800">
             <div className="w-96">
                 <h4 className="mb-6 text-3xl font-semibold text-gray-100">Admin</h4>
-                <form>
+                <form onSubmit={onSubmit}>
                     <div>
                         <label htmlFor="" className="text-gray-100">
                             Email

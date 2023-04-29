@@ -137,11 +137,19 @@ export const getServerSideProps = async ({ query, req }) => {
         role: true,
       },
     });
+    if(oneUser.role !== RoleEnum.Admin) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: "/401",
+        },
+      };
+    }
   } catch (e) {
     return {
       redirect: {
         permanent: false,
-        destination: "/login",
+        destination: "/admin/",
       },
     };
   }

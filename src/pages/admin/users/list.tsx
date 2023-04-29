@@ -165,7 +165,7 @@ export default function userList({ user, userList }: any) {
                               </svg>
                             </button>
                             <Link
-                              href={`/admin/user/edit/${u.id}`}
+                              href={`/admin/users/edit/${u.id}`}
                               className="text-gray-500 transition-colors duration-200 hover:text-yellow-500  focus:outline-none dark:hover:text-yellow-500"
                             >
                               <svg
@@ -213,11 +213,31 @@ export const getServerSideProps = async ({ query, req }) => {
 
   try {
     user = validateToken(req.cookies.ACCESS_TOKEN);
+
+    const oneUser = await prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+      },
+    });
+    if(oneUser.role !== RoleEnum.Admin) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: "/401",
+        },
+      };
+    }
   } catch (e) {
     return {
       redirect: {
         permanent: false,
-        destination: "/login",
+        destination: "/admin/",
       },
     };
   }

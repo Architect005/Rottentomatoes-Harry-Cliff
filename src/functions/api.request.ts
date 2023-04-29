@@ -19,12 +19,12 @@ export function login(data: {email: string; password: string}) {
   return fetcher("/login", data);
 }
 
-export function changeUser(data: {
-  id: string;
-  email: string;
-  password: string;
-}) {
-  return fetcher("/edit-user", data);
+export function logadmin(data: {email: string; password: string}) {
+  return fetcher("/logadmin", data);
+}
+
+export function logsadmin(data: {email: string; password: string}) {
+  return fetcher("/logsadmin", data);
 }
 
 export function editUser(data: {
