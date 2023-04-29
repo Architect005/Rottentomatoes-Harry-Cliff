@@ -8,18 +8,20 @@ import jwt from "jsonwebtoken";
 import { FilterEnum } from "@/functions/filter";
 import { useEffect, useState } from "react";
 import prisma from "@/functions/prisma";
-import { createCommentAndRate, getMovie } from "@/functions/request";
+import { getMovie } from "@/functions/request";
+import { createCommentAndRate } from "@/functions/api.request";
 import { useRouter } from "next/router";
 import { RoleEnum } from "@/functions/role.enum";
 import { type NextPage } from "next";
 
-const Movies: NextPage = ({ user, comments, id }: any) => {
-    const [rating, setRating] = useState<number>(0);
+const Movies: NextPage = ({ user, comments }: any) => {
+    const [rating, setRating] = useState<number>();
     const [comment, setComment] = useState<string>("");
     const [movieData, setMovieData] = useState(null); 
     const [actorList, setActorList] = useState([]);
     const [discoverMovie, setDiscoverMovie] = useState([]);
 
+    console.log(user);
     const router = useRouter();
     const { account } = router.query;
     
@@ -68,7 +70,7 @@ const Movies: NextPage = ({ user, comments, id }: any) => {
 
       const toastId = toast.loading("loading...");
       try {
-        const response = await createCommentAndRate({ comment: comment, rate: rating, movieId: movieData });
+        const response = await createCommentAndRate({ authorId: user.id, movieId: String(account), content: comment, rate: Number(rating) });
           toast.success("Thank you !.", {
             id: toastId,
           });
@@ -102,7 +104,7 @@ const Movies: NextPage = ({ user, comments, id }: any) => {
                 </Link>
                 <div className="flex items-center space-x-2 space-x-2min-h-screen text-sm text-gray-700">
                   <Link href="/us">ABOUT US</Link>
-                  {user ? (
+                  { user ? (
                     <Link href="/login">LOGOUT</Link>
                   ) : (
                     <Link href="/register">REGISTER</Link>
@@ -134,8 +136,8 @@ const Movies: NextPage = ({ user, comments, id }: any) => {
                   <Favorite></Favorite>
                 </div>
               </div>
-              {user ? (
-                <main>
+              { user ? (
+              <main>
               <form onSubmit={onSubmit} className="mt-12">
                 <div className="flex items-center justify-between">
                   <h4 className="mb-4 border-l-4 border-red-700 pl-1 font-semibold uppercase text-gray-200">
@@ -149,7 +151,7 @@ const Movies: NextPage = ({ user, comments, id }: any) => {
                 </div>
                 <textarea
                   onChange={onChangeComment}
-                  name=""
+                  name="Comment..."
                   id=""
                   value={comment}
                   cols={20}
@@ -168,7 +170,8 @@ const Movies: NextPage = ({ user, comments, id }: any) => {
                     RATE AND REVIEW
                   </h4>
                   <p className="h-[10vh] mb-4 pl-1 font-semibold uppercase text-gray-200">Subscribe to comment and rate !</p>
-              </div>)}
+              </div>
+              )}
             </div>
           </div>
           

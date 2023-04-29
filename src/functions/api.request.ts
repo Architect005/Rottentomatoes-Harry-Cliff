@@ -71,6 +71,6 @@ export function createMovie(data: { title: string; image: string }) {
   return fetcher("/create-movie", data);
 }
 
-export function createCommentAndRate(data: { comment: string; rate: number; movieId: number }) {
+export function createCommentAndRate(data: { authorId: string; movieId: string; content: string; rate: number }) {
   return fetcher("/create-comment", data);
 }
