@@ -16,13 +16,13 @@ import { type NextPage } from "next";
 const Movies: NextPage = ({ user, comments, id }: any) => {
     const [rating, setRating] = useState<number>(0);
     const [comment, setComment] = useState<string>("");
-    const [movieData, setMovieData] = useState<string>(""); 
+    const [movieData, setMovieData] = useState(null); 
     const [actorList, setActorList] = useState([]);
     const [discoverMovie, setDiscoverMovie] = useState([]);
 
     const router = useRouter();
-    const { index } = router.query;
-
+    const { account } = router.query;
+    
     interface movie {
       poster_path? : String;
       adult? : boolean;
@@ -43,10 +43,11 @@ const Movies: NextPage = ({ user, comments, id }: any) => {
         setDiscoverMovie(res.results)
       ))
 
-      getMovie("/discover/movie/")
+      getMovie("/movie/" + account)
       .then((res) =>(
-        setMovieData(res.results)
+        setMovieData(res)
       ))
+      .catch(console.log);
 
       getMovie("/discover/movie/")
       .then((res) =>(
@@ -79,7 +80,7 @@ const Movies: NextPage = ({ user, comments, id }: any) => {
       }
     }
     
-    if(!topMovie[0]) {
+    if(!movieData) {
       return <div className='w-full h-screen flex items-center justify-center'>
         <p className='text-center'>Loading...</p>
       </div>
@@ -100,7 +101,7 @@ const Movies: NextPage = ({ user, comments, id }: any) => {
                 <h4 className=" text-xl font-bold text-red-500">RT</h4>
                 </Link>
                 <div className="flex items-center space-x-2 space-x-2min-h-screen text-sm text-gray-700">
-                  <Link href="">ABOUT US</Link>
+                  <Link href="/us">ABOUT US</Link>
                   {user ? (
                     <Link href="/login">LOGOUT</Link>
                   ) : (
@@ -118,17 +119,17 @@ const Movies: NextPage = ({ user, comments, id }: any) => {
                     alt="Movie image"
                     src={
                     "https://image.tmdb.org/t/p/w500/"
-                    + topMovie[0].poster_path
+                    + movieData.poster_path
                     }
                     fill
                   />
                 </div>
                 <div className="space-y-4">
-                  <p className="text-xs">{topMovie[0].release_date}</p>
-                  <h4 className="text-5xl font-bold">{topMovie[0].title}</h4>
+                  <p className="text-xs">{movieData.release_date}</p>
+                  <h4 className="text-5xl font-bold">{movieData.title}</h4>
                   <small>Action</small>
                   <p className="w-96 text-xs text-gray-800">
-                    {topMovie[0].overview}
+                    {movieData.overview}
                   </p>
                   <Favorite></Favorite>
                 </div>
@@ -259,12 +260,8 @@ export const getServerSideProps = async ({ query, req }) => {
     });
     console.log({ authUser });
   } catch (e) {
-    return {
-      redirect: {
-        permanent: false,
-        destination: "/login",
-      },
-    };
+    user = null;
+    authUser = null;
   }
 
   return {

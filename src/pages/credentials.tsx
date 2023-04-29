@@ -3,12 +3,15 @@ import { toast } from "react-hot-toast";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { validateToken } from "@/functions/api.request";
-import { editUser } from "@/functions/api.request";
+import { changeUser } from "@/functions/api.request";
+import { RoleEnum } from "@/functions/role.enum";
 import prisma from "@/functions/prisma";
 
 function ChangeCredentials({user, oneUser}: any) {
+    console.log(user, oneUser);
     const [email, setEmail] = useState(oneUser?.email as unknown as string);
     const [password, setPassword] = useState(oneUser?.password as unknown as string);
+    
     const router = useRouter();
 
     function onChangeEmail(e: any) {
@@ -24,7 +27,7 @@ function ChangeCredentials({user, oneUser}: any) {
         console.log("response");
         try {
             console.log(email, password);
-            const response = await editUser({ id: oneUser.id, email, password });
+            const response = await changeUser({ id: user.id, email, password });
             console.log({response});
             if (response.status == 201) {
               toast.success("Credentials changed succesfully.", {
@@ -83,15 +86,16 @@ function ChangeCredentials({user, oneUser}: any) {
 
 export default ChangeCredentials;
 
-/*
 export const getServerSideProps = async ({ query, req }) => {
   let user;
   let oneUser;
 
+  console.log(req.cookies.ACCESS_TOKEN);
+  try {
     user = validateToken(req.cookies.ACCESS_TOKEN);
     oneUser = await prisma.user.findUnique({
       where: {
-        id: req.id as unknown as string,
+        id: user.id as unknown as string,
       },
       select: {
         id: true,
@@ -99,9 +103,25 @@ export const getServerSideProps = async ({ query, req }) => {
         password: true,
       },
     });
+    console.log(oneUser)
+    if(oneUser.role == RoleEnum.User) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: "/401",
+        },
+      };
+    }
+  } catch (e) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: "/login",
+      },
+    };
+  }
 
   return {
     props: { user, oneUser },
   };
 };
-*/

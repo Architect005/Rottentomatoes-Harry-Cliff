@@ -4,6 +4,7 @@ import prisma from "@/functions/prisma";
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { id, name, email } = req.body;
 
+  console.log(id, name, email)
   try {
     await prisma.user.update({
       where: {
