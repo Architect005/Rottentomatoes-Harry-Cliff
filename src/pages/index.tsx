@@ -205,7 +205,7 @@ function Favorite({ movieId, user, image, title }) {
 
   return (
     <div className="text-sm font-semibold text-gray-100">
-      <button onClick={onSubmit} className="text-l">❤{asfavorite ? "️Add to Favorite": "️Remove from favorite"}</button>
+      <button onClick={onSubmit} className="text-l">{asfavorite ? "️🔥Add to Favorite": "️Remove from favorite"}</button>
     </div>
   );
 }

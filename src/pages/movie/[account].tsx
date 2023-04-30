@@ -211,7 +211,7 @@ function Favorite({ index }: any) {
   };
   return (
     <div className="text-sm font-semibold text-gray-100">
-      <button onClick={adding} className="text-l">❤{state ? "️Add to Favorite": "️Remove from favorite"}</button>
+      <button onClick={adding} className="text-l">{state ? "️🔥Add to Favorite": "️Remove from favorite"}</button>
     </div>
   );
 }
