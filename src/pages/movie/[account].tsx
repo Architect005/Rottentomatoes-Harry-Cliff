@@ -13,8 +13,10 @@ import { createCommentAndRate } from "@/functions/api.request";
 import { useRouter } from "next/router";
 import { RoleEnum } from "@/functions/role.enum";
 import { type NextPage } from "next";
+import movie from "../api/movie";
+import { comment } from "postcss";
 
-const Movies: NextPage = ({ user, comments }: any) => {
+const Movies: NextPage = ({ user, comments, commentList }: any) => {
     const [rating, setRating] = useState<number>();
     const [comment, setComment] = useState<string>("");
     const [movieData, setMovieData] = useState(null); 
@@ -177,10 +179,10 @@ const Movies: NextPage = ({ user, comments }: any) => {
           
           <section className="mx-auto mt-60 h-full w-full max-w-4xl py-20">
           <div className='mt-8 text-gray-100 space-y-4'>
-            { comments && comments.map(comment => (
+            {commentList.map((comment) => (
               <div>
                 <div className='flex items-center justify-between'>
-                  <p>{comment.author.name}</p>
+                  {/* <p>{comment.author.name}</p> */}
                   <Rating
                     style={{ maxWidth: 80 }}
                     value={4}
@@ -189,6 +191,9 @@ const Movies: NextPage = ({ user, comments }: any) => {
                 <p>{comment.content}</p>
               </div>
              ))}
+             {/* {commentList.map((comment) => (
+
+             ))} */}
           </div>
           </section>
           <footer>
@@ -248,7 +253,21 @@ export const validateToken = (token: string) => {
 export const getServerSideProps = async ({ query, req }) => {
   let user;
   let authUser;
+
+  const commentList = await prisma.comment.findMany({
+    where: {
+      movieId: query.movieId,
+    },
+    select: {
+      id: true,
+      content: true,
+      authorId: true,
+//      rate: true,
+    },
+  })
+
   try {
+
     user = validateToken(req.cookies.ACCESS_TOKEN);
     authUser = await prisma.user.findUnique({
       where: {
@@ -268,6 +287,6 @@ export const getServerSideProps = async ({ query, req }) => {
   }
 
   return {
-    props: { user, authUser },
+    props: { user, authUser, commentList },
   };
 };
