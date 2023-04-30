@@ -62,9 +62,10 @@ model Movie {
 
 model Comment {
     id                String @id @default(cuid())
-    authorId          String
+    authorId          String 
     content           String
-    movieId           String
+    rate              Int
+    movieId           Int
     author            User  @relation(fields: [authorId], references: [id], onDelete: Cascade)
 }
 
