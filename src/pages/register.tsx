@@ -1,9 +1,13 @@
 import Link from "next/link";
-import Image from "next/image";
-import { toast } from "react-hot-toast";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { register } from "@/functions/api.request";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+function sleep() {
+  return new Promise(resolve => setTimeout(resolve, 3000));
+}
 
 function RegisterPage() {
     const [name, setName] = useState("");
@@ -23,21 +27,19 @@ function RegisterPage() {
 
     async function onSubmit(e: any) {
         e.preventDefault();
-        const toastId = toast.loading("loading...");
         console.log("Submit");
+        const response = await register({ name, email, password });
         try {
-            const response = await register({ name, email, password });
             if (response.status == 201) {
-              toast.success("User is created succesfully.", {
-                id: toastId,
-              });
+              toast.success("Welcome !")
+              sleep();
               router.push("/login");
             }
         } catch (e) {
+            if (response.status == 401) {
+                toast.error("User already exist !");
+            }
             console.error(e);
-            toast.success("Utilisateur existe déjà.", {
-            id: toastId,
-        });
       }
     }
 
@@ -93,6 +95,7 @@ function RegisterPage() {
                         Sign In
                       </Link>
                     </p>
+                    <ToastContainer/>
                 </form>
             </div>
         </main>

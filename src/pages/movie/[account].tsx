@@ -1,20 +1,17 @@
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
-import { toast } from "react-hot-toast";
 import { Rating } from "@smastrom/react-rating";
 import "@smastrom/react-rating/style.css";
 import jwt from "jsonwebtoken";
-import { FilterEnum } from "@/functions/filter";
 import { useEffect, useState } from "react";
 import prisma from "@/functions/prisma";
 import { getMovie } from "@/functions/request";
 import { createCommentAndRate } from "@/functions/api.request";
 import { useRouter } from "next/router";
-import { RoleEnum } from "@/functions/role.enum";
 import { type NextPage } from "next";
-import movie from "../api/movie";
-import { comment } from "postcss";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Movies: NextPage = ({ user, comments, commentList }: any) => {
     const [rating, setRating] = useState<number>();
@@ -69,18 +66,13 @@ const Movies: NextPage = ({ user, comments, commentList }: any) => {
 
     async function onSubmit(e) {
       e.preventDefault();
-
-      const toastId = toast.loading("loading...");
+      
       try {
         const response = await createCommentAndRate({ authorId: user.id, movieId: String(account), content: comment, rate: Number(rating) });
-          toast.success("Thank you !.", {
-            id: toastId,
-          });
+          toast.success("Thank you !.")
           router.reload()
       } catch (e) {
-        toast.error("An error occur.", {
-          id: toastId,
-        });
+        toast.error("An error occured.");
       }
     }
     
@@ -115,7 +107,6 @@ const Movies: NextPage = ({ user, comments, commentList }: any) => {
               </nav>
 
 
-              {/* Hero Section */}
               <div className="flex gap-x-10 lg:mt-20">
                 <div className="relative h-80 w-60 flex-none rounded-lg">
                   <Image
@@ -187,13 +178,13 @@ const Movies: NextPage = ({ user, comments, commentList }: any) => {
                   {/* <Rating
                     style={{ maxWidth: 80 }}
                     value={4}
-                    /> */}
+                  /> */}
                 </div>
                 <p>{comment.content}</p>
               </div>
              ))}
              {/* {commentList.map((comment) => (
-
+               
              ))} */}
           </div>
           </section>
@@ -202,34 +193,13 @@ const Movies: NextPage = ({ user, comments, commentList }: any) => {
               By Survivors
             </p>
           </footer>
+          <ToastContainer/>
         </main>
       </>
     );
 };  
 
 export default Movies;
-
-function MovieList({ image, title, rating, duration, genre, id}) {
-  return (
-    <div className="text-sm font-semibold text-gray-100">
-      <div className="relative py-50 h-72 w-full flex-none rounded-lg">
-        <Image
-          className="rounded-xl"
-          alt="Movie image"
-          src={"https://image.tmdb.org/t/p/w500/" + image}
-          fill
-        />
-      </div>
-      <div className="mt-2 space-y-1">
-        <p>{title}</p>
-        <div className="mt-2 space-y-1">
-          <p>120 min | ACTION</p>
-          <small>Vote: {rating*10}%</small>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function Favorite({ index }: any) {
 
