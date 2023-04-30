@@ -2,7 +2,6 @@ import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
 import { Jwt } from "jsonwebtoken";
-import { setTimeout } from "timers/promises";
 import { getMovie } from "@/functions/request";
 import { FilterEnum } from "@/functions/filter";
 import { type NextPage } from "next";
