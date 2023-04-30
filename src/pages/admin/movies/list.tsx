@@ -135,7 +135,7 @@ export default function MovieList({ user, movieList }: any) {
 export const getServerSideProps = async ({ query, req }) => {
   let user;
 
-  const moveList = await prisma.movie.findMany({
+  const movieList = await prisma.movie.findMany({
     select: {
       id: true,
       title: true,
@@ -176,6 +176,6 @@ export const getServerSideProps = async ({ query, req }) => {
   }
 
   return {
-    props: { user, moveList },
+    props: { user, movieList },
   };
 };
