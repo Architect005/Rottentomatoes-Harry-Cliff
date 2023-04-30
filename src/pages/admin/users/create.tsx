@@ -5,6 +5,7 @@ import { RoleEnum } from "@/functions/role.enum";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { toast } from "react-hot-toast";
+import { register } from "@/functions/api.request";
 
 export default function OneUser({ user }: any) {
   const [name, setName] = useState("");
@@ -24,6 +25,23 @@ export default function OneUser({ user }: any) {
     setPassword(e.target.value);
   }
 
+  async function onSubmit(e: any) {
+    e.preventDefault();
+    console.log("Submit");
+    const response = await register({ name, email, password });
+    try {
+        if (response.status == 201) {
+          toast.success("Welcome !")
+//          sleep();
+          router.push("/admin/users/create");
+        }
+    } catch (e) {
+        if (response.status == 401) {
+            toast.error("User already exist !");
+        }
+        console.error(e);
+    }
+  }
   return (
     <main className="flex h-screen w-full  flex-1">
       <nav className="h-full w-80 bg-gray-800">
@@ -51,7 +69,7 @@ export default function OneUser({ user }: any) {
         </div>
 
         <div>
-          <form>
+          <form onSubmit={onSubmit}>
             <div>
               <label htmlFor="" className="text-gray-700">
                 Name

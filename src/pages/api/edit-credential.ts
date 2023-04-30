@@ -1,19 +1,18 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import * as argon2 from "argon2";
 import prisma from "@/functions/prisma";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { id, name, email, role } = req.body;
+  const { id, email, password} = req.body;
 
-  console.log(id, name, email)
   try {
-    await prisma.user.update({
-      where: {
-        id: id as unknown as string,
-      },
-      data: {
-        name: name as unknown as string,
-        email: email as unknown as string,
-        role: role as unknown as string
+      await prisma.user.update({
+        where: {
+            id: id as unknown as string,
+        },
+          data: {
+          email: email as unknown as string,
+          password: await argon2.hash(password as unknown as string),
       },
     });
     console.log(id);

@@ -35,7 +35,7 @@ export default function EditOneUser({ user, oneUser }: any) {
         toast.success("User is updated succesfully.", {
           id: toastId,
         });
-        router.push("/admin/user");
+        router.push("/admin/users/list");
       }
     } catch (e) {
       console.error(e);
