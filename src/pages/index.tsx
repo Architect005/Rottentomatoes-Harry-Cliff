@@ -1,6 +1,8 @@
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
+import { Jwt } from "jsonwebtoken";
+import { setTimeout } from "timers/promises";
 import { getMovie } from "@/functions/request";
 import { FilterEnum } from "@/functions/filter";
 import { type NextPage } from "next";
@@ -9,9 +11,14 @@ import { useRouter } from "next/router";
 import prisma from "@/functions/prisma";
 import { addFavorite } from "@/functions/api.request";
 import { validateToken } from "@/functions/api.request";
-import { toast } from "react-hot-toast";
+import React from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { logout } from "@/functions/api.request";
-import movie from "./api/movie";
+
+function sleep() {
+  return new Promise(resolve => setTimeout(resolve, 3000));
+}
 
 const Home: NextPage = ({ user, movieList, favorites }) => {
   const router = useRouter();
@@ -46,16 +53,15 @@ const Home: NextPage = ({ user, movieList, favorites }) => {
   }, []);
 
   async function disconnect() {
-    const toastId = toast.loading("loading...");
     try {
         const response = await logout();
         if (response.status == 201) {
-          toast.success("User logout succesfully.", {
-            id: toastId,
-          });
+          toast.success("GoodBye !")
+          sleep();
           router.push("/login");
         }
       } catch (e) {
+        toast.error("Something went wrong !")
         console.error(e);
       }
   };
@@ -95,11 +101,15 @@ const Home: NextPage = ({ user, movieList, favorites }) => {
               </div>
             </nav>
 
-            {/* Hero Section */}
             <div className="flex gap-x-5 lg:mt-20 left-0">
+              <div className="flex">
+              {user ? (
               <div className="flex">
               <SlideMenu favorite={favorites}></SlideMenu>
               <Filter></Filter>
+              </div>
+              ) : (
+                <Filter></Filter>)} 
               </div>
 
               <div className="relative h-80 w-60 flex-none rounded-lg">
@@ -122,7 +132,7 @@ const Home: NextPage = ({ user, movieList, favorites }) => {
                   {topratedMovie[0].overview}
                 </p>
                 <small>Vote: {topratedMovie[0].vote_average*10}%</small>
-                <Favorite movieId={topratedMovie[0].id} user={user?.id}></Favorite>
+                <Favorite movieId={topratedMovie[0].id} user={user?.id} image={topratedMovie[0].poster_path} title={topratedMovie[0].title}></Favorite>
               </div>
             </div>
           </div>
@@ -170,6 +180,7 @@ const Home: NextPage = ({ user, movieList, favorites }) => {
             By Survivors
           </p>
         </footer>
+        <ToastContainer/>
       </main>
     </>
   );
@@ -184,18 +195,12 @@ function Favorite({ movieId, user, image, title }) {
   //console.log(image);
   async function onSubmit(e) {
     e.preventDefault();
-    const toastId = toast.loading("loading...");
     try {
       const response = await addFavorite({ authorId: user, movieId: movieId, image: image, title: title });
-        toast.success("Thank you !.", {
-          id: toastId,
-        });
+        toast.success("Added to favorites !");
         setAsFavorite(false);
-        //router.reload()
       } catch (e) {
-        toast.error("An error occur.", {
-          id: toastId,
-        });
+        toast.error("Log in/register please !")
       }
   }
 

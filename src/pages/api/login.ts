@@ -49,11 +49,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       })
     );
 
-    res.json({ status: 201, user });
+    res.json({ status: 201, user: "Authenticated !" });
 
   } else {
     res.status(401);
-    res.json({ error: "Email or Password is wrong" });
+    res.json({ status: 401, error: "Email or Password is wrong" });
   }
 };
 

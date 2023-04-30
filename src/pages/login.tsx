@@ -1,9 +1,13 @@
 import Link from "next/link";
-import Image from "next/image";
-import { toast } from "react-hot-toast";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { login } from "@/functions/api.request";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+function sleep() {
+  return new Promise(resolve => setTimeout(resolve, 3000));
+}
 
 function LoginPage() {
     const [email, setEmail] = useState("");
@@ -19,24 +23,19 @@ function LoginPage() {
 
     async function onSubmit(e: any) {
         e.preventDefault();
-        const toastId = toast.loading("loading...");
-        console.log("response");
+        const response = await login({ email, password });
         try {
             console.log(email, password);
-            const response = await login({ email, password });
             console.log({response});
             if (response.status == 201) {
-              toast.success("User log succesfully.", {
-                id: toastId,
-              });
-              router.push("/");
+                toast.success("Welcome !");
+                sleep();
+                router.push("/");
             }
-            if (response.status == 422) {
-                toast.error("Email or password incorrect", {
-                    id: toastId,
-                });
-            } 
         } catch (e) {
+            if (response.status == 401) {
+                toast.error("Wrong email/password !");
+            }
             console.error(e);
         }
     }
@@ -45,7 +44,7 @@ function LoginPage() {
         <main className="flex h-screen w-full items-center justify-center bg-gray-800">
             <div className="h-screen py-20 px-5">
                 <Link href="/">
-                <h4 className=" text-xl font-bold text-red-500"> RT</h4>
+                <h4 className=" text-xl font-bold text-red-500">RT</h4>
                 </Link>
             </div>
             <div className="w-96">
@@ -84,6 +83,7 @@ function LoginPage() {
                     </p>
                 </form>
             </div>
+            <ToastContainer/>
         </main>
     );
 }
