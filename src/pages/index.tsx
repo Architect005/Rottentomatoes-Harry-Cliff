@@ -14,7 +14,7 @@ import { validateToken } from "@/functions/api.request";
 import { toast } from "react-hot-toast";
 import { logout } from "@/functions/api.request";
 
-const Home: NextPage = ({ user }) => {
+const Home: NextPage = ({ user, movieList }) => {
   const router = useRouter();
 
   console.log(user);
@@ -140,7 +140,30 @@ const Home: NextPage = ({ user }) => {
                 <Favorite index={discoverMovie}></Favorite>
                 </div>
               ))}
-              
+            {movieList?.map((movie) => (
+                    <tr key={movie.Id}>
+                      <td className="whitespace-nowrap px-4 py-4 text-sm font-medium text-gray-700">
+                      <div className="relative w-14 aspect-square flex-none rounded-full">
+                        <Image
+                          className="rounded-full"
+                          alt="Image"
+                          src={
+                            "https://image.tmdb.org/t/p/w500/" +
+                            movie.image
+                          }
+                          fill
+                        />
+                      </div>
+                      </td>
+                      <td className="whitespace-nowrap px-12 py-4 text-sm font-medium text-gray-700">
+                        <p>{movie.title}</p>
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-4 text-sm">
+                        <div className="flex items-center gap-x-6">
+                        </div>
+                      </td>
+                    </tr>
+                    ))}
           </div>
         </section>
         <footer>
@@ -282,6 +305,15 @@ function MovieList({ image, title, rating, duration, genre}) {
 export const getServerSideProps = async ({ query, req }) => {
   let user;
   let authUser;
+
+  const movieList = await prisma.movie.findMany({
+    select: {
+      id: true,
+      title: true,
+      image: true,
+    },
+  });
+
   try {
     user = validateToken(req.cookies.ACCESS_TOKEN);
     authUser = await prisma.user.findUnique({
@@ -302,6 +334,6 @@ export const getServerSideProps = async ({ query, req }) => {
   }
 
   return {
-    props: { user, authUser },
+    props: { user, authUser, movieList },
   };
 };

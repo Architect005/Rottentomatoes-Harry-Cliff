@@ -16,7 +16,7 @@ export default function OneUser({ user }: any) {
   const router = useRouter();
 
   useEffect(() => {
-    getMovie("/movie/popular")
+    getMovie("/movie/top_rated")
       .then((res) => {
         setMovieList(res.results);
       })
@@ -39,6 +39,7 @@ export default function OneUser({ user }: any) {
         image: selectedMovie.poster_path,
       });
       if (response.status == 201) {
+        console.log("Movie");
         toast.success("Movie is created succesfully.", {
           id: toastId,
         });
@@ -65,7 +66,7 @@ export default function OneUser({ user }: any) {
               Movie
             </Link>
             <Link
-              href="/admin/users"
+              href="/admin/users/list"
               className=" block w-full rounded-lg bg-gray-700 px-3 py-3 text-gray-100"
             >
               User
@@ -116,7 +117,7 @@ export default function OneUser({ user }: any) {
                 onChange={onChangeFilm}
                 className=" mb-6 w-full appearance-none rounded-md bg-gray-200 px-2 py-2.5 text-gray-700 outline-none focus-within:ring-gray-700 focus:ring-2"
               >
-                {movieList.map((movie) => (
+                {movieList?.map((movie) => (
                   <option key={movie.id} value={movie.id}>
                     {movie.title}
                   </option>

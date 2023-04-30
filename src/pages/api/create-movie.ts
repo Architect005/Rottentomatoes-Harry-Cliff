@@ -6,7 +6,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   let movie;
 
+  
   try {
+    console.log(title);
     movie = await prisma.movie.create({
       data: {
         title: title as string,
