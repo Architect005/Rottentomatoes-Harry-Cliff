@@ -49,16 +49,16 @@ export default function EditOneUser({ user, oneUser }: any) {
     <main className="flex h-screen w-full  flex-1">
       <nav className="h-full w-80 bg-gray-800">
         <div className="space-y-6 px-6 py-6">
-          <h4 className="text-xl font-bold text-red-800 ">TM</h4>
+          <h4 className="text-xl font-bold text-red-800 ">RT</h4>
           <div className="space-y-4">
             <Link
-              href="/admin/movie"
+              href="/admin/movies/list"
               className=" block w-full rounded-lg bg-gray-700 px-3 py-3 text-gray-100"
             >
               Movie
             </Link>
             <Link
-              href="/admin/user"
+              href="/admin/users/list"
               className=" block w-full rounded-lg bg-gray-700 px-3 py-3 text-gray-100"
             >
               User
@@ -137,7 +137,18 @@ export const getServerSideProps = async ({ query, req }) => {
         role: true,
       },
     });
-    if(oneUser.role !== RoleEnum.Admin) {
+    const AuthUser = await prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+      },
+    });
+    if(AuthUser.role !== RoleEnum.Admin) {
       return {
         redirect: {
           permanent: false,

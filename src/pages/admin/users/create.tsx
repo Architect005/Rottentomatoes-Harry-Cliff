@@ -31,13 +31,13 @@ export default function OneUser({ user }: any) {
           <h4 className="text-xl font-bold text-red-800 ">Admin</h4>
           <div className="space-y-4">
             <Link
-              href="/admin/movie"
+              href="/admin/movies/list"
               className=" block w-full rounded-lg bg-gray-700 px-3 py-3 text-gray-100"
             >
               Movie
             </Link>
             <Link
-              href="/admin/user"
+              href="/admin/users/list"
               className=" block w-full rounded-lg bg-gray-700 px-3 py-3 text-gray-100"
             >
               User

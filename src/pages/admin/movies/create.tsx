@@ -60,7 +60,7 @@ export default function OneUser({ user }: any) {
           <h4 className="text-xl font-bold text-red-800 ">TM</h4>
           <div className="space-y-4">
             <Link
-              href="/admin/movies"
+              href="/admin/movies/list"
               className=" block w-full rounded-lg bg-gray-700 px-3 py-3 text-gray-100"
             >
               Movie

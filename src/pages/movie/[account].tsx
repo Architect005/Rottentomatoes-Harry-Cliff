@@ -227,7 +227,7 @@ export const getServerSideProps = async ({ query, req }) => {
 
   const commentList = await prisma.comment.findMany({
     where: {
-      movieId: query.movieId,
+      movieId: query.movieId as unknown as number,
     },
     select: {
       id: true,
