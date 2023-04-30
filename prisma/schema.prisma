@@ -81,6 +81,8 @@ model Favorite {
     id                String @id @default(cuid())
     authorId          String
     movieId           Int
+    image             String 
+    title             String
     author            User @relation(fields: [authorId], references: [id], onDelete: Cascade)
 }
 
