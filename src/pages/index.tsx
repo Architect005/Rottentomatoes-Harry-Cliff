@@ -13,7 +13,7 @@ import { toast } from "react-hot-toast";
 import { logout } from "@/functions/api.request";
 import movie from "./api/movie";
 
-const Home: NextPage = ({ user, movieList }) => {
+const Home: NextPage = ({ user, movieList, favorites }) => {
   const router = useRouter();
 
   console.log(user);
@@ -98,7 +98,7 @@ const Home: NextPage = ({ user, movieList }) => {
             {/* Hero Section */}
             <div className="flex gap-x-5 lg:mt-20 left-0">
               <div className="flex">
-              <SlideMenu></SlideMenu>
+              <SlideMenu favorite={favorites}></SlideMenu>
               <Filter></Filter>
               </div>
 
@@ -136,15 +136,15 @@ const Home: NextPage = ({ user, movieList }) => {
                 <Link href={"/movie/" + movie.id}>
                   <MovieList rating={movie.vote_average} title={movie.title} image={movie.poster_path} genre={movie.genres} duration={movie.runtime}/>
                 </Link>
-                <Favorite movieId={movie.id} user={user?.id}></Favorite>
+                <Favorite movieId={movie.id} user={user?.id} image={movie.poster_path} title={movie.title}></Favorite>
                 </div>
               ))}
             {movieList?.map((movie) => (
                     <tr key={movie.Id}>
-                      <td className="whitespace-nowrap px-4 py-4 text-sm font-medium text-gray-700">
-                      <div className="relative w-14 aspect-square flex-none rounded-full">
+                      <div className="text-sm font-semibold text-gray-100">
+                        <div className="relative h-72 w-full flex-none rounded-lg">
                         <Image
-                          className="rounded-full"
+                          className="rounded-xl"
                           alt="Image"
                           src={
                             "https://image.tmdb.org/t/p/w500/" +
@@ -152,15 +152,15 @@ const Home: NextPage = ({ user, movieList }) => {
                           }
                           fill
                         />
-                      </div>
-                      </td>
-                      <td className="whitespace-nowrap px-12 py-4 text-sm font-medium text-gray-700">
-                        <p>{movie.title}</p>
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-4 text-sm">
-                        <div className="flex items-center gap-x-6">
                         </div>
-                      </td>
+                      <div className="mt-2 space-y-1">
+                        <p>{movie.title}</p>
+                        <div className="mt-2 space-y-1">
+                          <p>120 min | ACTION</p>
+                          <small>Vote: 50%</small>
+                        </div>
+                      </div>
+                      </div>
                     </tr>
                     ))}
           </div>
@@ -177,15 +177,16 @@ const Home: NextPage = ({ user, movieList }) => {
 
 export default Home;
 
-function Favorite({ movieId, user }: any) {
+function Favorite({ movieId, user, image, title }) {
 
   const [ asfavorite, setAsFavorite ] = useState(true);
 
+  //console.log(image);
   async function onSubmit(e) {
     e.preventDefault();
     const toastId = toast.loading("loading...");
     try {
-      const response = await addFavorite({ authorId: user, movieId: movieId });
+      const response = await addFavorite({ authorId: user, movieId: movieId, image: image, title: title });
         toast.success("Thank you !.", {
           id: toastId,
         });
@@ -205,27 +206,7 @@ function Favorite({ movieId, user }: any) {
   );
 }
 
-function SlideMenu ( movieId ) {
-  interface movie {
-    poster_path? : String;
-    adult? : boolean;
-    overview? : String;
-    release_date? : String;
-    id? : number;
-    vote_average? : number;
-    title? : String;
-    popularity? : number;
-    genre_ids? : number[];
-  }
-
-  const [topratedMovie, setDiscoverMovie] = useState<movie[]>([]);
-  
-  useEffect(() => {
-    getMovie("/discover/movie")
-    .then((res) => (
-      setDiscoverMovie(res.results)
-    ))
-  }, []);
+function SlideMenu ({ favorite }) {
 
   var sideMenu = document.getElementById('side-menu');
   const openMenu = async () => {
@@ -237,30 +218,24 @@ function SlideMenu ( movieId ) {
       sideMenu.classList.add('left-[-250px]');
   };
 
-  if(!topratedMovie[0]) {
-    return <div className='w-full h-screen flex items-center justify-center'>
-      <p className='text-center'>Loading...</p>
-    </div>
-  }
-
   return (
   <body>
     <div id="side-menu" className="fixed top-0 left-[-250px] w-[240px] h-screen z-50 bg-gray-700 p-5
     flex flex-col space-y-5 text-white duration-300">
         <a href="javascript:void(0)" className="text-right text-4xl" onClick={closeMenu}>&times;</a>
-        <section>
-        <Image
-          className="rounded"
-          height={80}
-          width={80}
+        {favorite.map((movie) => (
+        <Link href={"/movie/" + movie.movieId}>
+          <div>
+          <Image
+          width={50}
+          height={50}
           alt="Movie image"
-          src={
-            "https://image.tmdb.org/t/p/w500/" + 
-            topratedMovie[0].poster_path
-          }
-        />
-        <a className="text-xs">{topratedMovie[0].title}</a>
-        </section>
+          src={"https://image.tmdb.org/t/p/w500/" + movie.image}
+          />
+          <p>{movie.title}</p>
+        </div>
+        </Link>
+        ))}
     </div>
 
     <main className="p-0 space-x-5">
@@ -317,6 +292,17 @@ export const getServerSideProps = async ({ query, req }) => {
   let user;
   let authUser;
 
+
+  const favorites = await prisma.favorite.findMany({
+    select: {
+      id: true,
+      authorId: true,
+      movieId: true,
+      image: true,
+      title: true,
+    },
+  });
+
   const movieList = await prisma.movie.findMany({
     select: {
       id: true,
@@ -345,6 +331,6 @@ export const getServerSideProps = async ({ query, req }) => {
   }
 
   return {
-    props: { user, authUser, movieList },
+    props: { user, authUser, movieList, favorites },
   };
 };

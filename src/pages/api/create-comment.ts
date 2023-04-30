@@ -4,7 +4,7 @@ import { validateToken } from "@/functions/api.request";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { movieId, authorId, content, rate } = req.body;
-
+  
   const user = validateToken(req.cookies.ACCESS_TOKEN);
   let comment;
 

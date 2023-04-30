@@ -3,7 +3,7 @@ import prisma from "@/functions/prisma";
 import { validateToken } from "@/functions/api.request";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { movieId, authorId } = req.body;
+  const { authorId, movieId, image, title } = req.body;
 
   const user = validateToken(req.cookies.ACCESS_TOKEN);
   let favorite;
@@ -12,6 +12,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       favorite = await prisma.favorite.create({
       data: {
         movieId: movieId as number,
+        image: image as string,
+        title: title as string,
         author: {
           connect: {
             id: user.id,
