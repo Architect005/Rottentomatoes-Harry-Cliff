@@ -42,7 +42,7 @@ export function changeUser(data: {
   email: string;
   password: string;
 }) {
-  return fetcher("/edit-user", data);
+  return fetcher("/edit-credentials", data);
 }
 
 export function createAdmin(data: {
