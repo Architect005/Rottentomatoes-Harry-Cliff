@@ -182,11 +182,12 @@ const Movies: NextPage = ({ user, comments, commentList }: any) => {
             {commentList.map((comment) => (
               <div>
                 <div className='flex items-center justify-between'>
-                  {/* <p>{comment.author.name}</p> */}
-                  <Rating
+                  <p>{comment.author?.name}</p>
+                  <li>{comment.rate}</li>
+                  {/* <Rating
                     style={{ maxWidth: 80 }}
                     value={4}
-                    />
+                    /> */}
                 </div>
                 <p>{comment.content}</p>
               </div>
